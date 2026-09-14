@@ -1,0 +1,2985 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام متابعة لجان مستشفى الولادة والأطفال - حفر الباطن 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* @section: css-variables */
+:root {
+  --primary: #0F4C81;
+  --primary-light: #1a6bb5;
+  --primary-dark: #0a3460;
+  --accent: #14B8A6;
+  --accent-light: #2dd4bf;
+  --gold: #C9A84C;
+  --gold-light: #e0c36a;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --bg: #f0f4f8;
+  --bg2: #e8edf4;
+  --card: #ffffff;
+  --card2: #f8fafc;
+  --border: #e2e8f0;
+  --border2: #cbd5e1;
+  --text: #1e293b;
+  --text2: #475569;
+  --muted: #94a3b8;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.04);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  --transition: all 0.2s ease;
+}
+
+/* @section: dark-mode */
+body.dark {
+  --bg: #0f172a;
+  --bg2: #162032;
+  --card: #1e293b;
+  --card2: #253347;
+  --border: #334155;
+  --border2: #475569;
+  --text: #f1f5f9;
+  --text2: #cbd5e1;
+  --muted: #64748b;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.35), 0 4px 6px rgba(0,0,0,0.2);
+}
+
+/* @section: base-reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Tajawal', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  direction: rtl;
+  transition: background 0.3s, color 0.3s;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* @section: login-screen */
+#loginScreen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--accent) 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.login-box {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+  text-align: center;
+}
+body.dark .login-box { background: rgba(30,41,59,0.95); }
+.login-logo { font-size: 3.5rem; margin-bottom: 8px; }
+.login-title { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+.login-subtitle { font-size: 0.9rem; color: var(--text2); margin-bottom: 32px; }
+.login-form { display: flex; flex-direction: column; gap: 16px; }
+.login-form select, .login-form input {
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.95rem;
+  background: var(--card);
+  color: var(--text);
+  transition: var(--transition);
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.login-form select:focus, .login-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15,76,129,0.15);
+}
+.login-btn {
+  padding: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 0.5px;
+}
+.login-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15,76,129,0.4); }
+.login-error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  background: rgba(239,68,68,0.1);
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.login-hint {
+  margin-top: 16px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  background: var(--bg2);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  line-height: 1.8;
+}
+
+/* @section: top-bar */
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 56px;
+  background: var(--primary);
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.tb-logo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: white;
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+}
+.tb-url-wrap {
+  display: flex; align-items: center; gap: 6px;
+  flex: 1;
+  max-width: 520px;
+}
+.tb-url-wrap input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.78rem;
+  direction: ltr;
+  min-width: 0;
+}
+.tb-url-wrap input::placeholder { color: rgba(255,255,255,0.6); }
+.tb-url-wrap input:focus { outline: none; background: rgba(255,255,255,0.18); border-color: var(--accent); }
+.tb-connect-btn {
+  padding: 6px 12px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+.tb-connect-btn:hover { background: var(--accent-light); }
+.tb-status {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tb-status.demo { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); }
+.tb-status.connected { background: rgba(34,197,94,0.2); color: #86efac; }
+.tb-status.loading { background: rgba(245,158,11,0.2); color: #fcd34d; }
+.tb-status.error { background: rgba(239,68,68,0.2); color: #fca5a5; }
+.tb-clock { color: rgba(255,255,255,0.7); font-size: 0.82rem; white-space: nowrap; }
+.tb-dark-btn, .tb-logout-btn {
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: white;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+.tb-dark-btn:hover, .tb-logout-btn:hover { background: rgba(255,255,255,0.2); }
+.tb-user-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  color: white;
+  white-space: nowrap;
+}
+
+/* @section: sidebar */
+.sidebar {
+  position: fixed;
+  top: 56px; right: 0; bottom: 0;
+  width: 230px;
+  background: var(--card);
+  border-left: 1px solid var(--border);
+  z-index: 900;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+  display: flex; flex-direction: column;
+}
+.sidebar-header {
+  padding: 20px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.hospital-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.4;
+}
+.hospital-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.nav-section { padding: 12px 0; }
+.nav-section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 0 16px 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: var(--transition);
+  border-radius: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  position: relative;
+}
+.nav-item:hover { background: var(--bg2); color: var(--primary); }
+.nav-item.active {
+  background: rgba(15,76,129,0.08);
+  color: var(--primary);
+  font-weight: 700;
+  border-left: 3px solid var(--primary);
+}
+body:not(.dark) .nav-item.active { border-right: 3px solid var(--primary); border-left: none; }
+body.dark .nav-item.active { border-right: 3px solid var(--accent); border-left: none; color: var(--accent); }
+.nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+.nav-badge {
+  margin-right: auto;
+  background: var(--danger);
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* @section: main-layout */
+.main-content {
+  margin-right: 230px;
+  margin-top: 56px;
+  padding: 24px;
+  min-height: calc(100vh - 56px);
+}
+
+/* @section: page-sections */
+.page-section { display: none; }
+.page-section.active { display: block; }
+
+/* @section: page-header */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap; gap: 12px;
+}
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.page-subtitle {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.page-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex; align-items: center; gap: 6px;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-light); box-shadow: var(--shadow-md); }
+.btn-accent { background: var(--accent); color: white; }
+.btn-accent:hover { background: var(--accent-light); }
+.btn-outline {
+  background: transparent;
+  color: var(--text2);
+  border: 1.5px solid var(--border2);
+}
+.btn-outline:hover { background: var(--bg2); border-color: var(--primary); color: var(--primary); }
+.btn-gold { background: var(--gold); color: white; }
+.btn-gold:hover { background: var(--gold-light); }
+.btn-danger { background: var(--danger); color: white; }
+.btn-sm { padding: 5px 10px; font-size: 0.8rem; }
+.btn-icon { padding: 7px 9px; }
+
+/* @section: kpi-cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .kpi-grid { grid-template-columns: 1fr 1fr; } }
+.kpi-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 4px; height: 100%;
+}
+.kpi-card.blue::before { background: var(--primary); }
+.kpi-card.green::before { background: var(--success); }
+.kpi-card.orange::before { background: var(--warning); }
+.kpi-card.red::before { background: var(--danger); }
+.kpi-card.teal::before { background: var(--accent); }
+.kpi-card.gold::before { background: var(--gold); }
+.kpi-card.purple::before { background: #8b5cf6; }
+.kpi-card.indigo::before { background: #6366f1; }
+.kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.kpi-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.kpi-icon {
+  width: 42px; height: 42px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+}
+.kpi-card.blue .kpi-icon { background: rgba(15,76,129,0.1); }
+.kpi-card.green .kpi-icon { background: rgba(34,197,94,0.1); }
+.kpi-card.orange .kpi-icon { background: rgba(245,158,11,0.1); }
+.kpi-card.red .kpi-icon { background: rgba(239,68,68,0.1); }
+.kpi-card.teal .kpi-icon { background: rgba(20,184,166,0.1); }
+.kpi-card.gold .kpi-icon { background: rgba(201,168,76,0.1); }
+.kpi-card.purple .kpi-icon { background: rgba(139,92,246,0.1); }
+.kpi-card.indigo .kpi-icon { background: rgba(99,102,241,0.1); }
+.kpi-trend {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+.kpi-trend.up { color: var(--success); background: rgba(34,197,94,0.1); }
+.kpi-trend.down { color: var(--danger); background: rgba(239,68,68,0.1); }
+.kpi-trend.neutral { color: var(--muted); background: var(--bg2); }
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.kpi-label { font-size: 0.82rem; color: var(--text2); font-weight: 500; }
+.kpi-sub { font-size: 0.75rem; color: var(--muted); margin-top: 6px; }
+
+/* @section: chart-containers */
+.charts-row {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.charts-row-3 { grid-template-columns: repeat(3, 1fr); }
+.charts-row-2 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 1100px) {
+  .charts-row-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 760px) {
+  .charts-row-3, .charts-row-2 { grid-template-columns: 1fr; }
+}
+.chart-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.chart-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.chart-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 16px; }
+.chart-wrap { position: relative; }
+
+/* @section: data-table */
+.data-table-wrap {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.dt-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap; gap: 12px;
+}
+.dt-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+.dt-count { font-size: 0.8rem; color: var(--muted); }
+.filters-bar {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+.filter-input, .filter-select {
+  padding: 7px 12px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  background: var(--card);
+  color: var(--text);
+  transition: var(--transition);
+}
+.filter-input:focus, .filter-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(15,76,129,0.1);
+}
+.filter-input { min-width: 200px; }
+.table-scroll { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+thead th {
+  background: var(--bg2);
+  color: var(--text2);
+  font-weight: 700;
+  padding: 12px 14px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  font-size: 0.8rem;
+  cursor: pointer;
+  user-select: none;
+}
+thead th:hover { color: var(--primary); }
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: var(--transition);
+}
+tbody tr:hover { background: rgba(15,76,129,0.03); }
+tbody tr:last-child { border-bottom: none; }
+tbody td {
+  padding: 11px 14px;
+  color: var(--text);
+  vertical-align: middle;
+}
+.table-pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap; gap: 10px;
+}
+.pagination-info { font-size: 0.82rem; color: var(--muted); }
+.pagination-btns { display: flex; gap: 4px; }
+.pg-btn {
+  padding: 5px 10px;
+  border: 1px solid var(--border2);
+  background: var(--card);
+  color: var(--text2);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.82rem;
+  transition: var(--transition);
+}
+.pg-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+.pg-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* @section: status-badges */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-success { background: rgba(34,197,94,0.12); color: #16a34a; }
+.badge-warning { background: rgba(245,158,11,0.12); color: #d97706; }
+.badge-danger { background: rgba(239,68,68,0.12); color: #dc2626; }
+.badge-info { background: rgba(59,130,246,0.12); color: #2563eb; }
+.badge-muted { background: var(--bg2); color: var(--muted); }
+.badge-purple { background: rgba(139,92,246,0.12); color: #7c3aed; }
+.badge-primary { background: rgba(15,76,129,0.12); color: var(--primary); }
+
+/* @section: compliance-bar */
+.compliance-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.compliance-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  min-width: 60px;
+}
+.compliance-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.compliance-pct { font-size: 0.8rem; font-weight: 700; color: var(--text); min-width: 36px; }
+
+/* @section: quick-stats */
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media (max-width: 700px) { .quick-stats { grid-template-columns: 1fr; } }
+.qs-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 14px;
+}
+.qs-icon { font-size: 2rem; }
+.qs-label { font-size: 0.78rem; color: var(--muted); margin-bottom: 3px; }
+.qs-value { font-size: 1rem; font-weight: 700; color: var(--text); }
+
+/* @section: alerts-page */
+.alerts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 760px) { .alerts-grid { grid-template-columns: 1fr; } }
+.alert-section-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.alert-section-header {
+  padding: 14px 18px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.alert-section-header.red { background: rgba(239,68,68,0.07); color: var(--danger); }
+.alert-section-header.yellow { background: rgba(245,158,11,0.07); color: var(--warning); }
+.alert-section-header.orange { background: rgba(249,115,22,0.07); color: #f97316; }
+.alert-section-header.blue { background: rgba(59,130,246,0.07); color: var(--info); }
+.alert-item {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 10px;
+}
+.alert-item:last-child { border-bottom: none; }
+.alert-item-name { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.alert-item-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+.alert-empty { padding: 20px 18px; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+/* @section: calendar-page */
+.calendar-wrap {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.cal-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.cal-nav-title { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.cal-nav-btns { display: flex; gap: 8px; }
+.cal-view-btns { display: flex; gap: 4px; }
+.cal-view-btn {
+  padding: 5px 12px;
+  border: 1px solid var(--border2);
+  background: var(--bg2);
+  color: var(--text2);
+  border-radius: 6px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.cal-view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.cal-grid { padding: 16px; }
+.cal-days-header {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 4px; margin-bottom: 8px;
+}
+.cal-day-header {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 6px;
+}
+.cal-cells {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-cell {
+  min-height: 80px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  padding: 6px;
+  background: var(--bg2);
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.cal-cell:hover { background: rgba(15,76,129,0.05); border-color: var(--primary); }
+.cal-cell.today { border-color: var(--primary); background: rgba(15,76,129,0.06); }
+.cal-cell.other-month { opacity: 0.4; }
+.cal-cell-date {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 4px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.cal-cell-date.today-num {
+  width: 22px; height: 22px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+}
+.cal-event {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+.cal-event.completed { background: rgba(34,197,94,0.15); color: #16a34a; }
+.cal-event.scheduled { background: rgba(59,130,246,0.15); color: #2563eb; }
+.cal-event.delayed { background: rgba(239,68,68,0.15); color: #dc2626; }
+.cal-event.upcoming { background: rgba(245,158,11,0.15); color: #d97706; }
+
+/* @section: reports-page */
+.report-tabs {
+  display: flex; gap: 6px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0;
+}
+.report-tab {
+  padding: 10px 18px;
+  border: none;
+  background: transparent;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: var(--transition);
+}
+.report-tab:hover { color: var(--primary); }
+.report-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.report-panel { display: none; }
+.report-panel.active { display: block; }
+.report-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+@media (max-width: 700px) { .report-summary-grid { grid-template-columns: 1fr; } }
+.report-stat-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.rsc-value { font-size: 1.8rem; font-weight: 900; color: var(--primary); }
+.rsc-label { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
+
+/* @section: users-page */
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) { .users-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .users-grid { grid-template-columns: 1fr; } }
+.user-role-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  text-align: center;
+  transition: var(--transition);
+}
+.user-role-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.user-role-icon { font-size: 2.5rem; margin-bottom: 10px; }
+.user-role-name { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.user-role-access { font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; }
+.user-role-perms { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.perm-tag {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--bg2);
+  color: var(--text2);
+}
+.perm-tag.granted { background: rgba(34,197,94,0.1); color: #16a34a; }
+.perm-tag.denied { background: rgba(239,68,68,0.1); color: #dc2626; }
+
+/* @section: settings-page */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 760px) { .settings-grid { grid-template-columns: 1fr; } }
+.settings-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.settings-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+.settings-field { margin-bottom: 14px; }
+.settings-label { font-size: 0.85rem; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; }
+.settings-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.88rem;
+  background: var(--bg2);
+  color: var(--text);
+  transition: var(--transition);
+}
+.settings-input:focus { outline: none; border-color: var(--primary); background: var(--card); }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 0.88rem; color: var(--text2); }
+.toggle {
+  position: relative;
+  width: 44px; height: 24px;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--border2);
+  border-radius: 24px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  left: 3px; top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+.toggle input:checked + .toggle-slider { background: var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+/* @section: decisions-page */
+.progress-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.progress-bar {
+  flex: 1; height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 70px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* @section: modal */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 500px; width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+  transform: scale(0.95);
+  transition: transform 0.2s;
+}
+.modal-overlay.open .modal-box { transform: scale(1); }
+.modal-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.modal-field { margin-bottom: 12px; }
+.modal-label { font-size: 0.82rem; color: var(--muted); margin-bottom: 4px; }
+.modal-value { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+/* @section: loading-spinner */
+.loading-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  gap: 16px;
+}
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* @section: tooltips-toast */
+.toast-container {
+  position: fixed;
+  bottom: 24px; left: 24px;
+  z-index: 3000;
+  display: flex; flex-direction: column; gap: 8px;
+  max-width: 340px;
+}
+.toast {
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.88rem;
+  color: var(--text);
+  display: flex; align-items: flex-start; gap: 10px;
+  animation: slideUp 0.3s ease;
+  position: relative;
+}
+.toast.success { border-right: 4px solid var(--success); }
+.toast.error { border-right: 4px solid var(--danger); }
+.toast.warning { border-right: 4px solid var(--warning); }
+.toast.info { border-right: 4px solid var(--info); }
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* @section: responsive */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-right: 0; padding: 16px; }
+  .menu-toggle-btn { display: flex !important; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.menu-toggle-btn {
+  display: none;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: white;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 850;
+}
+.sidebar-overlay.open { display: block; }
+
+/* @section: print */
+@media print {
+  .top-bar, .sidebar, .sidebar-overlay, .toast-container, .modal-overlay { display: none !important; }
+  .main-content { margin: 0 !important; padding: 10px !important; }
+  .page-section { display: block !important; }
+  .page-section:not(.active) { display: none !important; }
+}
+
+/* @section: misc */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+.text-center { text-align: center; }
+.text-muted { color: var(--muted); }
+.font-bold { font-weight: 700; }
+.mt-auto { margin-top: auto; }
+.gap-2 { gap: 8px; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+.empty-state-icon { font-size: 2.5rem; margin-bottom: 10px; }
+.empty-state-text { font-size: 0.9rem; }
+.section-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.info-item { }
+.info-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 2px; }
+.info-value { font-size: 0.92rem; font-weight: 600; color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- @section: login-screen-html -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">🏥</div>
+    <div class="login-title">مستشفى الولادة والأطفال</div>
+    <div class="login-subtitle">حفر الباطن — نظام متابعة اللجان 2026</div>
+    <div class="login-form">
+      <select id="loginRole">
+        <option value="">-- اختر دورك --</option>
+        <option value="admin">مدير النظام</option>
+        <option value="quality">إدارة الجودة</option>
+        <option value="chairman">رئيس اللجنة</option>
+        <option value="coordinator">منسق اللجنة</option>
+        <option value="viewer">مشاهد فقط</option>
+      </select>
+      <input type="password" id="loginPass" placeholder="كلمة المرور" />
+      <div class="login-error" id="loginError">❌ كلمة المرور غير صحيحة</div>
+      <button class="login-btn" onclick="doLogin()">🔐 دخول</button>
+    </div>
+    <div class="login-hint">
+      <strong>بيانات تجريبية:</strong><br>
+      مدير النظام: Admin@2026 &nbsp;|&nbsp; الجودة: QM@2026<br>
+      رئيس اللجنة: Chair@2026 &nbsp;|&nbsp; منسق: Coord@2026 &nbsp;|&nbsp; مشاهد: View@2026
+    </div>
+  </div>
+</div>
+
+<!-- @section: top-bar-html -->
+<div class="top-bar" id="topBar">
+  <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div class="tb-logo">🏥 <span>MCH حفر الباطن</span></div>
+  <div class="tb-url-wrap">
+    <input id="csvInput" placeholder="رابط Google Sheet CSV..." dir="ltr" value="" />
+    <button class="tb-connect-btn" onclick="connectNow()">🔌 ربط</button>
+  </div>
+  <div id="tbStatus" class="tb-status demo">⚪ تجريبي</div>
+  <div id="tbClock" class="tb-clock"></div>
+  <div class="tb-user-badge" id="tbUserBadge">👤 ضيف</div>
+  <button class="tb-dark-btn" onclick="toggleDark()" id="darkBtn" title="وضع داكن">🌙</button>
+  <button class="tb-logout-btn" onclick="doLogout()" title="تسجيل خروج">🚪</button>
+</div>
+
+<!-- @section: sidebar-html -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="hospital-name">🏥 مستشفى الولادة والأطفال</div>
+    <div class="hospital-sub">حفر الباطن | إدارة الجودة</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">الصفحات الرئيسية</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="nav-icon">📊</span> لوحة القيادة التنفيذية
+    </div>
+    <div class="nav-item" onclick="showPage('committees')">
+      <span class="nav-icon">👥</span> متابعة اللجان
+    </div>
+    <div class="nav-item" onclick="showPage('decisions')">
+      <span class="nav-icon">📋</span> متابعة القرارات
+    </div>
+    <div class="nav-item" onclick="showPage('alerts')">
+      <span class="nav-icon">🔔</span> التنبيهات الذكية
+      <span class="nav-badge" id="alertsBadge">0</span>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">التخطيط والتقارير</div>
+    <div class="nav-item" onclick="showPage('calendar')">
+      <span class="nav-icon">📅</span> التقويم السنوي
+    </div>
+    <div class="nav-item" onclick="showPage('reports')">
+      <span class="nav-icon">📈</span> التقارير التنفيذية
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">النظام</div>
+    <div class="nav-item" onclick="showPage('users')">
+      <span class="nav-icon">🛡️</span> صلاحيات المستخدمين
+    </div>
+    <div class="nav-item" onclick="showPage('settings')">
+      <span class="nav-icon">⚙️</span> الإعدادات
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    نظام متابعة اللجان v5.0<br>
+    © 2026 MCH حفر الباطن
+  </div>
+</nav>
+
+<!-- @section: main-content-html -->
+<div class="main-content" id="mainContent">
+
+  <!-- ===== EXECUTIVE DASHBOARD ===== -->
+  <div class="page-section active" id="page-dashboard">
+    <div class="page-header">
+      <div>
+        <div class="page-title">📊 لوحة القيادة التنفيذية</div>
+        <div class="page-subtitle">نظرة شاملة على أداء لجان المستشفى | <span id="lastUpdate">--</span></div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-outline btn-sm" onclick="connectNow()">🔄 تحديث</button>
+        <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ طباعة</button>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card blue">
+        <div class="kpi-header">
+          <div class="kpi-icon">👥</div>
+          <span class="kpi-trend neutral" id="kpi-total-trend">٢٢</span>
+        </div>
+        <div class="kpi-value" id="kpi-total">22</div>
+        <div class="kpi-label">إجمالي اللجان</div>
+        <div class="kpi-sub">لجان المستشفى المعتمدة</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-header">
+          <div class="kpi-icon">✅</div>
+          <span class="kpi-trend up" id="kpi-completed-trend">↑</span>
+        </div>
+        <div class="kpi-value" id="kpi-completed">0</div>
+        <div class="kpi-label">اجتماعات مكتملة</div>
+        <div class="kpi-sub">انعقدت في موعدها</div>
+      </div>
+      <div class="kpi-card teal">
+        <div class="kpi-header">
+          <div class="kpi-icon">📅</div>
+          <span class="kpi-trend neutral">—</span>
+        </div>
+        <div class="kpi-value" id="kpi-scheduled">0</div>
+        <div class="kpi-label">اجتماعات مجدولة</div>
+        <div class="kpi-sub">قيد التخطيط</div>
+      </div>
+      <div class="kpi-card orange">
+        <div class="kpi-header">
+          <div class="kpi-icon">⚠️</div>
+          <span class="kpi-trend down" id="kpi-delayed-trend">↓</span>
+        </div>
+        <div class="kpi-value" id="kpi-delayed">0</div>
+        <div class="kpi-label">متأخرة / متعثرة</div>
+        <div class="kpi-sub">تحتاج تدخل عاجل</div>
+      </div>
+      <div class="kpi-card gold">
+        <div class="kpi-header">
+          <div class="kpi-icon">📊</div>
+          <span class="kpi-trend up">↑</span>
+        </div>
+        <div class="kpi-value" id="kpi-compliance">0%</div>
+        <div class="kpi-label">نسبة الالتزام العامة</div>
+        <div class="kpi-sub">معدل الانعقاد في الموعد</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-header">
+          <div class="kpi-icon">📆</div>
+          <span class="kpi-trend neutral">—</span>
+        </div>
+        <div class="kpi-value" id="kpi-thismonth">0</div>
+        <div class="kpi-label">اجتماعات هذا الشهر</div>
+        <div class="kpi-sub">يونيو 2026</div>
+      </div>
+      <div class="kpi-card indigo">
+        <div class="kpi-header">
+          <div class="kpi-icon">🔮</div>
+          <span class="kpi-trend neutral">—</span>
+        </div>
+        <div class="kpi-value" id="kpi-upcoming30">0</div>
+        <div class="kpi-label">خلال 30 يوماً</div>
+        <div class="kpi-sub">اجتماعات قادمة</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-header">
+          <div class="kpi-icon">🚨</div>
+          <span class="kpi-trend down">!</span>
+        </div>
+        <div class="kpi-value" id="kpi-overdue">0</div>
+        <div class="kpi-label">متأخرة جداً</div>
+        <div class="kpi-sub">Overdue + تجاوزت المدة</div>
+      </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="charts-row charts-row-3">
+      <div class="chart-card">
+        <div class="chart-title">📈 اتجاه الأداء الشهري</div>
+        <div class="chart-sub">الاجتماعات المنعقدة شهرياً 2026</div>
+        <div class="chart-wrap" style="height:200px">
+          <canvas id="chartTrend"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🍩 توزيع حالات الاجتماعات</div>
+        <div class="chart-sub">نسب الحالات المختلفة</div>
+        <div class="chart-wrap" style="height:200px">
+          <canvas id="chartStatus"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">📊 الالتزام حسب القسم</div>
+        <div class="chart-sub">نسبة الالتزام لكل إدارة</div>
+        <div class="chart-wrap" style="height:200px">
+          <canvas id="chartDept"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="charts-row charts-row-2">
+      <div class="chart-card">
+        <div class="chart-title">📊 المنعقد مقابل المخطط</div>
+        <div class="chart-sub">مقارنة الاجتماعات حسب اللجنة</div>
+        <div class="chart-wrap" style="height:250px; overflow-x:auto">
+          <canvas id="chartCompare"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🎯 مقارنة الأداء بالرادار</div>
+        <div class="chart-sub">أعلى وأدنى الأقسام التزاماً</div>
+        <div class="chart-wrap" style="height:250px">
+          <canvas id="chartRadar"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+      <div class="qs-card">
+        <div class="qs-icon">🏆</div>
+        <div>
+          <div class="qs-label">أعلى لجنة التزاماً</div>
+          <div class="qs-value" id="topCommittee">—</div>
+        </div>
+      </div>
+      <div class="qs-card">
+        <div class="qs-icon">⚠️</div>
+        <div>
+          <div class="qs-label">أقل لجنة التزاماً</div>
+          <div class="qs-value" id="bottomCommittee">—</div>
+        </div>
+      </div>
+      <div class="qs-card">
+        <div class="qs-icon">📅</div>
+        <div>
+          <div class="qs-label">أقرب اجتماع قادم</div>
+          <div class="qs-value" id="nextMeeting">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COMMITTEES PAGE ===== -->
+  <div class="page-section" id="page-committees">
+    <div class="page-header">
+      <div>
+        <div class="page-title">👥 متابعة اللجان</div>
+        <div class="page-subtitle">22 لجنة معتمدة | 15 قسم</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-outline btn-sm" onclick="exportTableCSV('committeesTable','لجان_المستشفى')">📥 تصدير CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="connectNow()">🔄 تحديث</button>
+      </div>
+    </div>
+    <div class="data-table-wrap">
+      <div class="dt-header">
+        <div>
+          <div class="dt-title">جدول اللجان الكامل</div>
+          <div class="dt-count" id="committeesCount">جاري التحميل...</div>
+        </div>
+      </div>
+      <div class="filters-bar">
+        <input class="filter-input" id="searchCommittees" placeholder="🔍 ابحث عن لجنة أو رئيس..." oninput="filterCommittees()">
+        <select class="filter-select" id="filterDept" onchange="filterCommittees()">
+          <option value="">كل الأقسام</option>
+        </select>
+        <select class="filter-select" id="filterStatus" onchange="filterCommittees()">
+          <option value="">كل الحالات</option>
+          <option value="Completed">مكتملة</option>
+          <option value="Scheduled">مجدولة</option>
+          <option value="Delayed">متأخرة</option>
+          <option value="Overdue">متأخرة جداً</option>
+          <option value="Upcoming">قادمة</option>
+          <option value="Cancelled">ملغاة</option>
+        </select>
+        <select class="filter-select" id="filterCompliance" onchange="filterCommittees()">
+          <option value="">كل نسب الالتزام</option>
+          <option value="high">≥ 80% (ملتزم)</option>
+          <option value="mid">50-79% (يحتاج متابعة)</option>
+          <option value="low">&lt; 50% (متأخر)</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="clearFilters()">✖ مسح</button>
+      </div>
+      <div class="table-scroll">
+        <table id="committeesTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم اللجنة</th>
+              <th>القسم</th>
+              <th>رئيس اللجنة</th>
+              <th>المنسق</th>
+              <th>التكرار</th>
+              <th>المخطط</th>
+              <th>المنعقد</th>
+              <th>الالتزام %</th>
+              <th>آخر اجتماع</th>
+              <th>القادم</th>
+              <th>الحالة</th>
+              <th>إجراء</th>
+            </tr>
+          </thead>
+          <tbody id="committeesBody">
+            <tr><td colspan="13" class="text-center" style="padding:40px; color:var(--muted)">⏳ جاري تحميل البيانات...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-pagination">
+        <div class="pagination-info" id="committeesPageInfo"></div>
+        <div class="pagination-btns" id="committeesPagination"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DECISIONS PAGE ===== -->
+  <div class="page-section" id="page-decisions">
+    <div class="page-header">
+      <div>
+        <div class="page-title">📋 متابعة القرارات والتوصيات</div>
+        <div class="page-subtitle">قرارات اللجان وحالة تنفيذها</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-outline btn-sm" onclick="exportTableCSV('decisionsTable','قرارات_اللجان')">📥 تصدير CSV</button>
+      </div>
+    </div>
+    <div class="data-table-wrap">
+      <div class="dt-header">
+        <div class="dt-title">📋 سجل القرارات والتوصيات</div>
+      </div>
+      <div class="filters-bar">
+        <input class="filter-input" id="searchDecisions" placeholder="🔍 ابحث في القرارات..." oninput="filterDecisions()">
+        <select class="filter-select" id="filterDecStatus" onchange="filterDecisions()">
+          <option value="">كل الحالات</option>
+          <option value="completed">مكتمل</option>
+          <option value="inprogress">قيد التنفيذ</option>
+          <option value="delayed">متأخر</option>
+          <option value="notstarted">لم يبدأ</option>
+        </select>
+      </div>
+      <div class="table-scroll">
+        <table id="decisionsTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اللجنة</th>
+              <th>التوصية / القرار</th>
+              <th>الإدارة المسؤولة</th>
+              <th>تاريخ الاستحقاق</th>
+              <th>نسبة الإنجاز</th>
+              <th>الحالة</th>
+              <th>إجراء</th>
+            </tr>
+          </thead>
+          <tbody id="decisionsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ALERTS PAGE ===== -->
+  <div class="page-section" id="page-alerts">
+    <div class="page-header">
+      <div>
+        <div class="page-title">🔔 التنبيهات الذكية</div>
+        <div class="page-subtitle">تنبيهات اللجان ومتابعة التذكيرات التلقائية</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-primary btn-sm" onclick="sendBulkReminder()">📧 إرسال تذكير جماعي</button>
+        <button class="btn btn-outline btn-sm" onclick="connectNow()">🔄 تحديث</button>
+      </div>
+    </div>
+    <div class="alerts-grid" id="alertsGrid">
+      <div class="loading-state"><div class="spinner"></div><span>جاري تحميل التنبيهات...</span></div>
+    </div>
+    <!-- Reminder stages info -->
+    <div class="section-card">
+      <div class="chart-title" style="margin-bottom:16px">📬 مراحل التذكير التلقائي</div>
+      <div class="charts-row charts-row-3">
+        <div style="text-align:center; padding:16px; background:rgba(34,197,94,0.07); border-radius:var(--radius-sm); border:1px solid rgba(34,197,94,0.2)">
+          <div style="font-size:2rem; margin-bottom:8px">🟢</div>
+          <div style="font-weight:700; color:var(--success); margin-bottom:4px">التذكير الأول</div>
+          <div style="font-size:0.82rem; color:var(--text2)">قبل الاجتماع بـ 5 أيام</div>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:6px">يتضمن: اسم اللجنة، التاريخ، الوقت، رابط الأجندة</div>
+        </div>
+        <div style="text-align:center; padding:16px; background:rgba(245,158,11,0.07); border-radius:var(--radius-sm); border:1px solid rgba(245,158,11,0.2)">
+          <div style="font-size:2rem; margin-bottom:8px">🟡</div>
+          <div style="font-weight:700; color:var(--warning); margin-bottom:4px">التذكير الثاني</div>
+          <div style="font-size:0.82rem; color:var(--text2)">قبل الاجتماع بـ 3 أيام</div>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:6px">يتضمن: تذكير بالأجندة، مراجعة الإجراءات السابقة</div>
+        </div>
+        <div style="text-align:center; padding:16px; background:rgba(239,68,68,0.07); border-radius:var(--radius-sm); border:1px solid rgba(239,68,68,0.2)">
+          <div style="font-size:2rem; margin-bottom:8px">🔴</div>
+          <div style="font-weight:700; color:var(--danger); margin-bottom:4px">التذكير الثالث</div>
+          <div style="font-size:0.82rem; color:var(--text2)">قبل الاجتماع بـ يوم</div>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:6px">يتضمن: تنبيه عاجل، تأكيد الموعد، رابط الأجندة المباشر</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CALENDAR PAGE ===== -->
+  <div class="page-section" id="page-calendar">
+    <div class="page-header">
+      <div>
+        <div class="page-title">📅 التقويم السنوي</div>
+        <div class="page-subtitle">جميع اجتماعات اللجان في عرض تقويمي تفاعلي</div>
+      </div>
+    </div>
+    <div class="calendar-wrap">
+      <div class="cal-nav">
+        <div style="display:flex; gap:8px; align-items:center">
+          <button class="btn btn-outline btn-sm" onclick="calPrev()">→ السابق</button>
+          <div class="cal-nav-title" id="calTitle">يونيو 2026</div>
+          <button class="btn btn-outline btn-sm" onclick="calNext()">التالي ←</button>
+        </div>
+        <div class="cal-view-btns">
+          <button class="cal-view-btn active" onclick="setCalView('month',this)">شهري</button>
+          <button class="cal-view-btn" onclick="setCalView('week',this)">أسبوعي</button>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center; font-size:0.78rem">
+          <span style="display:inline-flex; align-items:center; gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,0.4);display:inline-block"></span>مكتملة</span>
+          <span style="display:inline-flex; align-items:center; gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(59,130,246,0.4);display:inline-block"></span>مجدولة</span>
+          <span style="display:inline-flex; align-items:center; gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(239,68,68,0.4);display:inline-block"></span>متأخرة</span>
+          <span style="display:inline-flex; align-items:center; gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(245,158,11,0.4);display:inline-block"></span>قادمة</span>
+        </div>
+      </div>
+      <div class="cal-grid">
+        <div class="cal-days-header">
+          <div class="cal-day-header">الأحد</div>
+          <div class="cal-day-header">الاثنين</div>
+          <div class="cal-day-header">الثلاثاء</div>
+          <div class="cal-day-header">الأربعاء</div>
+          <div class="cal-day-header">الخميس</div>
+          <div class="cal-day-header">الجمعة</div>
+          <div class="cal-day-header">السبت</div>
+        </div>
+        <div class="cal-cells" id="calCells"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== REPORTS PAGE ===== -->
+  <div class="page-section" id="page-reports">
+    <div class="page-header">
+      <div>
+        <div class="page-title">📈 التقارير التنفيذية</div>
+        <div class="page-subtitle">تقارير شاملة لأداء اللجان والأقسام</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ طباعة PDF</button>
+        <button class="btn btn-accent btn-sm" onclick="exportReportCSV()">📥 تصدير Excel</button>
+      </div>
+    </div>
+    <div class="report-tabs">
+      <button class="report-tab active" onclick="switchReportTab('compliance',this)">📊 التزام اللجان</button>
+      <button class="report-tab" onclick="switchReportTab('dept',this)">🏢 التزام الأقسام</button>
+      <button class="report-tab" onclick="switchReportTab('executive',this)">🏆 التقرير التنفيذي</button>
+    </div>
+
+    <!-- Compliance Tab -->
+    <div class="report-panel active" id="rp-compliance">
+      <div class="report-summary-grid">
+        <div class="report-stat-card">
+          <div class="rsc-value" id="rpt-total">0</div>
+          <div class="rsc-label">إجمالي الاجتماعات</div>
+        </div>
+        <div class="report-stat-card">
+          <div class="rsc-value" id="rpt-done">0</div>
+          <div class="rsc-label">اجتماعات مكتملة</div>
+        </div>
+        <div class="report-stat-card">
+          <div class="rsc-value" id="rpt-rate">0%</div>
+          <div class="rsc-label">نسبة الالتزام العامة</div>
+        </div>
+      </div>
+      <div class="charts-row charts-row-2">
+        <div class="chart-card">
+          <div class="chart-title">📊 نسبة الالتزام لكل لجنة</div>
+          <div class="chart-wrap" style="height:300px; overflow-x:auto">
+            <canvas id="chartReportCompliance"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">🍩 توزيع الحالات</div>
+          <div class="chart-wrap" style="height:300px">
+            <canvas id="chartReportStatus"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="data-table-wrap">
+        <div class="dt-header"><div class="dt-title">جدول التزام اللجان</div></div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>#</th><th>اللجنة</th><th>القسم</th><th>المخطط</th><th>المنعقد</th><th>المتأخر</th><th>الالتزام %</th><th>الحالة</th></tr>
+            </thead>
+            <tbody id="reportComplianceBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dept Tab -->
+    <div class="report-panel" id="rp-dept">
+      <div class="data-table-wrap">
+        <div class="dt-header"><div class="dt-title">جدول التزام الأقسام (15 قسم)</div></div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>#</th><th>القسم</th><th>عدد اللجان</th><th>الاجتماعات المخططة</th><th>المنعقدة</th><th>المتأخرة</th><th>نسبة الإنجاز</th><th>الحالة</th></tr>
+            </thead>
+            <tbody id="reportDeptBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="chart-card" style="margin-top:16px">
+        <div class="chart-title">📊 الالتزام حسب الأقسام</div>
+        <div class="chart-wrap" style="height:320px">
+          <canvas id="chartReportDept"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Executive Tab -->
+    <div class="report-panel" id="rp-executive">
+      <div class="section-card" id="execReportContent">
+        <div class="chart-title" style="font-size:1.2rem; margin-bottom:20px">📋 التقرير التنفيذي الشامل</div>
+        <div id="execReportBody">جاري إعداد التقرير...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== USERS PAGE ===== -->
+  <div class="page-section" id="page-users">
+    <div class="page-header">
+      <div>
+        <div class="page-title">🛡️ صلاحيات المستخدمين</div>
+        <div class="page-subtitle">إدارة الأدوار والصلاحيات</div>
+      </div>
+    </div>
+    <div class="users-grid">
+      <div class="user-role-card">
+        <div class="user-role-icon">👑</div>
+        <div class="user-role-name">مدير النظام</div>
+        <div class="user-role-access">وصول كامل لجميع البيانات والإعدادات</div>
+        <div style="background:var(--bg2); border-radius:var(--radius-sm); padding:8px 12px; font-size:0.8rem; color:var(--muted); direction:ltr; margin-bottom:12px">Admin@2026</div>
+        <div class="user-role-perms">
+          <span class="perm-tag granted">✅ عرض الكل</span>
+          <span class="perm-tag granted">✅ تعديل</span>
+          <span class="perm-tag granted">✅ حذف</span>
+          <span class="perm-tag granted">✅ إعدادات</span>
+          <span class="perm-tag granted">✅ تقارير</span>
+          <span class="perm-tag granted">✅ مستخدمين</span>
+        </div>
+      </div>
+      <div class="user-role-card">
+        <div class="user-role-icon">🔬</div>
+        <div class="user-role-name">إدارة الجودة</div>
+        <div class="user-role-access">وصول كامل للبيانات والتقارير</div>
+        <div style="background:var(--bg2); border-radius:var(--radius-sm); padding:8px 12px; font-size:0.8rem; color:var(--muted); direction:ltr; margin-bottom:12px">QM@2026</div>
+        <div class="user-role-perms">
+          <span class="perm-tag granted">✅ عرض الكل</span>
+          <span class="perm-tag granted">✅ تقارير</span>
+          <span class="perm-tag granted">✅ تنبيهات</span>
+          <span class="perm-tag denied">❌ إعدادات</span>
+          <span class="perm-tag denied">❌ مستخدمين</span>
+        </div>
+      </div>
+      <div class="user-role-card">
+        <div class="user-role-icon">🎖️</div>
+        <div class="user-role-name">رئيس اللجنة</div>
+        <div class="user-role-access">وصول للجانه فقط</div>
+        <div style="background:var(--bg2); border-radius:var(--radius-sm); padding:8px 12px; font-size:0.8rem; color:var(--muted); direction:ltr; margin-bottom:12px">Chair@2026</div>
+        <div class="user-role-perms">
+          <span class="perm-tag granted">✅ لجنته</span>
+          <span class="perm-tag granted">✅ تقريره</span>
+          <span class="perm-tag denied">❌ لجان أخرى</span>
+          <span class="perm-tag denied">❌ إعدادات</span>
+        </div>
+      </div>
+      <div class="user-role-card">
+        <div class="user-role-icon">📎</div>
+        <div class="user-role-name">منسق اللجنة</div>
+        <div class="user-role-access">إدارة وتنسيق لجنته</div>
+        <div style="background:var(--bg2); border-radius:var(--radius-sm); padding:8px 12px; font-size:0.8rem; color:var(--muted); direction:ltr; margin-bottom:12px">Coord@2026</div>
+        <div class="user-role-perms">
+          <span class="perm-tag granted">✅ لجنته</span>
+          <span class="perm-tag granted">✅ رفع مستندات</span>
+          <span class="perm-tag denied">❌ لجان أخرى</span>
+          <span class="perm-tag denied">❌ تقارير كاملة</span>
+        </div>
+      </div>
+      <div class="user-role-card">
+        <div class="user-role-icon">👁️</div>
+        <div class="user-role-name">مشاهد</div>
+        <div class="user-role-access">عرض فقط بدون تعديل</div>
+        <div style="background:var(--bg2); border-radius:var(--radius-sm); padding:8px 12px; font-size:0.8rem; color:var(--muted); direction:ltr; margin-bottom:12px">View@2026</div>
+        <div class="user-role-perms">
+          <span class="perm-tag granted">✅ عرض</span>
+          <span class="perm-tag denied">❌ تعديل</span>
+          <span class="perm-tag denied">❌ حذف</span>
+          <span class="perm-tag denied">❌ إعدادات</span>
+        </div>
+      </div>
+    </div>
+    <!-- Logged-in users table demo -->
+    <div class="data-table-wrap">
+      <div class="dt-header"><div class="dt-title">المستخدمون النشطون حالياً</div></div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>#</th><th>الدور</th><th>الاسم</th><th>آخر دخول</th><th>الحالة</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>مدير النظام</td><td>نظام الجودة — MCH</td><td>الآن</td><td><span class="badge badge-success">🟢 نشط</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS PAGE ===== -->
+  <div class="page-section" id="page-settings">
+    <div class="page-header">
+      <div>
+        <div class="page-title">⚙️ الإعدادات</div>
+        <div class="page-subtitle">إعدادات النظام والربط مع Google Sheets</div>
+      </div>
+    </div>
+    <div class="settings-grid">
+      <!-- Sheet Connection -->
+      <div class="settings-card">
+        <div class="settings-title">🔗 ربط Google Sheets</div>
+        <div class="settings-field">
+          <label class="settings-label">رابط Google Sheet CSV (نشر عام)</label>
+          <input class="settings-input" id="settingsCsvUrl" placeholder="https://docs.google.com/spreadsheets/d/e/...pub?output=csv" dir="ltr">
+        </div>
+        <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="saveAndConnect()">🔌 اتصال وحفظ</button>
+          <button class="btn btn-outline" onclick="testConnection()">🧪 اختبار الاتصال</button>
+          <button class="btn btn-accent btn-sm" onclick="fillDefaultURL()">📋 استخدام الرابط الافتراضي</button>
+        </div>
+        <div style="margin-top:14px; padding:12px; background:var(--bg2); border-radius:var(--radius-sm); font-size:0.8rem; color:var(--muted); line-height:1.9">
+          <strong>📌 طريقة الحصول على الرابط:</strong><br>
+          1. افتح Google Sheet → ملف<br>
+          2. مشاركة وتصدير → نشر على الويب<br>
+          3. اختر: قيمة مفصولة بفاصلة (.csv)<br>
+          4. انقر نشر ← انسخ الرابط هنا
+        </div>
+      </div>
+
+      <!-- Hospital Info -->
+      <div class="settings-card">
+        <div class="settings-title">🏥 بيانات المستشفى</div>
+        <div class="settings-field">
+          <label class="settings-label">اسم المستشفى</label>
+          <input class="settings-input" value="مستشفى الولادة والأطفال - حفر الباطن">
+        </div>
+        <div class="settings-field">
+          <label class="settings-label">بريد إدارة الجودة</label>
+          <input class="settings-input" value="qad.mch@gmail.com" dir="ltr">
+        </div>
+        <div class="settings-field">
+          <label class="settings-label">سنة التقرير</label>
+          <input class="settings-input" value="2026">
+        </div>
+        <button class="btn btn-primary" onclick="showToast('تم حفظ بيانات المستشفى','success')">💾 حفظ</button>
+      </div>
+
+      <!-- Alerts Settings -->
+      <div class="settings-card">
+        <div class="settings-title">🔔 إعدادات التنبيهات</div>
+        <div class="toggle-row">
+          <span class="toggle-label">تفعيل التذكيرات التلقائية</span>
+          <label class="toggle"><input type="checkbox" checked id="tog1"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">تذكير قبل 5 أيام (أخضر)</span>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">تذكير قبل 3 أيام (أصفر)</span>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">تذكير قبل يوم واحد (أحمر)</span>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">إشعارات ما بعد الاجتماع</span>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">CC تلقائي لـ qad.mch@gmail.com</span>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <!-- Display Settings -->
+      <div class="settings-card">
+        <div class="settings-title">🎨 إعدادات العرض</div>
+        <div class="toggle-row">
+          <span class="toggle-label">الوضع الداكن (Dark Mode)</span>
+          <label class="toggle"><input type="checkbox" id="darkToggle" onchange="toggleDark()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">تحديث تلقائي كل 5 دقائق</span>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">إظهار الرسوم البيانية</span>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="settings-field" style="margin-top:14px">
+          <label class="settings-label">لغة الواجهة</label>
+          <select class="settings-input">
+            <option selected>العربية</option>
+            <option>English</option>
+          </select>
+        </div>
+        <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap">
+          <button class="btn btn-danger btn-sm" onclick="clearCache()">🗑️ مسح الذاكرة المؤقتة</button>
+          <button class="btn btn-outline btn-sm" onclick="resetSettings()">↺ إعادة ضبط</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-title" id="modalTitle">تفاصيل</div>
+    <div id="modalContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" onclick="closeModalDirect()">✖ إغلاق</button>
+      <button class="btn btn-primary btn-sm" id="modalAction" style="display:none">إجراء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ================================================================= -->
+<!-- JavaScript -->
+<!-- ================================================================= -->
+<script>
+'use strict';
+
+/* @section: constants */
+const DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_hid-FdfRYFzYJrofSOGQjyannoy6sqIzWzm23nmaD4VFl1o_XEvxJILFpe2OQ/pub?output=csv';
+const STORAGE_KEY = 'mch_csv_v5';
+const DARK_KEY = 'mch_dark_v5';
+
+/* @section: roles */
+const ROLES = {
+  admin:       { name: 'مدير النظام',    password: 'Admin@2026',  icon: '👑', access: 'all' },
+  quality:     { name: 'إدارة الجودة',   password: 'QM@2026',     icon: '🔬', access: 'all' },
+  chairman:    { name: 'رئيس اللجنة',   password: 'Chair@2026',  icon: '🎖️', access: 'own' },
+  coordinator: { name: 'منسق اللجنة',   password: 'Coord@2026',  icon: '📎', access: 'own' },
+  viewer:      { name: 'مشاهد',          password: 'View@2026',   icon: '👁️', access: 'readonly' }
+};
+
+/* @section: state */
+let rawData = [];
+let filteredCommittees = [];
+let committeesPage = 1;
+const ITEMS_PER_PAGE = 15;
+let currentUser = null;
+let charts = {};
+let calYear = 2026, calMonth = 5; // June = 5 (0-indexed)
+let calView = 'month';
+let autoRefreshTimer = null;
+
+/* @section: demo-data */
+const DEMO_DATA = [
+  { id:'C001', name:'Maternity & Children Hospital Governing Body', dept:'Hospital Administration', chair:'Dr. Ahmed Al-Ghamdi', coord:'Nora Al-Otaibi', freq:'Quarterly', planned:'2026-03-15', actual:'2026-03-15', status:'Completed', agenda:'Yes', minutes:'Yes', email:'governing@mch.sa' },
+  { id:'C002', name:'Hospital Executive Management', dept:'Hospital Administration', chair:'Dr. Khalid Al-Zahrani', coord:'Sara Al-Malki', freq:'Monthly', planned:'2026-06-10', actual:'2026-06-10', status:'Completed', agenda:'Yes', minutes:'Yes', email:'exec@mch.sa' },
+  { id:'C003', name:'General Safety', dept:'Safety & Facility Mgmt', chair:'Eng. Faisal Al-Rashidi', coord:'Ahmad Al-Shehri', freq:'Monthly', planned:'2026-06-15', actual:'', status:'Scheduled', agenda:'No', minutes:'No', email:'safety@mch.sa' },
+  { id:'C004', name:'Credentialing & Privileging', dept:'Medical Staff Office', chair:'Dr. Hana Al-Dosari', coord:'Maha Al-Qahtani', freq:'Quarterly', planned:'2026-07-01', actual:'', status:'Upcoming', agenda:'No', minutes:'No', email:'cred@mch.sa' },
+  { id:'C005', name:"Patient's Rights / Advocacy", dept:'Patient Experience', chair:'Dr. Layla Al-Harthi', coord:'Reem Al-Faifi', freq:'Monthly', planned:'2026-05-28', actual:'', status:'Delayed', agenda:'No', minutes:'No', email:'rights@mch.sa' },
+  { id:'C006', name:'Infection Prevention & Control', dept:'Infection Control', chair:'Dr. Mona Al-Bishi', coord:'Dina Al-Sulaiman', freq:'Monthly', planned:'2026-06-12', actual:'2026-06-12', status:'Completed', agenda:'Yes', minutes:'Yes', email:'ipc@mch.sa' },
+  { id:'C007', name:'Antimicrobial Stewardship', dept:'Pharmacy', chair:'Dr. Tariq Al-Asiri', coord:'Lama Al-Ayed', freq:'Monthly', planned:'2026-06-18', actual:'', status:'Scheduled', agenda:'Yes', minutes:'No', email:'amr@mch.sa' },
+  { id:'C008', name:'Pharmacy & Therapeutic', dept:'Pharmacy', chair:'Dr. Nadia Al-Shaikh', coord:'Haya Al-Mutairi', freq:'Monthly', planned:'2026-06-20', actual:'', status:'Scheduled', agenda:'No', minutes:'No', email:'pharma@mch.sa' },
+  { id:'C009', name:'Quality Improvement', dept:'Quality', chair:'Dr. Saleh Al-Ghamdi', coord:'Fatima Al-Zahrani', freq:'Monthly', planned:'2026-06-05', actual:'2026-06-05', status:'Completed', agenda:'Yes', minutes:'Yes', email:'qi@mch.sa' },
+  { id:'C010', name:'Patient Safety', dept:'Quality', chair:'Dr. Omar Al-Balawi', coord:'Nouf Al-Enezi', freq:'Monthly', planned:'2026-06-08', actual:'2026-06-08', status:'Completed', agenda:'Yes', minutes:'Yes', email:'safety.pt@mch.sa' },
+  { id:'C011', name:'Blood & Blood Utilization', dept:'Laboratory', chair:'Dr. Asmaa Al-Harbi', coord:'Rania Al-Otaibi', freq:'Quarterly', planned:'2026-07-15', actual:'', status:'Upcoming', agenda:'No', minutes:'No', email:'blood@mch.sa' },
+  { id:'C012', name:'VTE Committee', dept:'Medical Administration', chair:'Dr. Yasser Al-Qahtani', coord:'Ghada Al-Khaldi', freq:'Quarterly', planned:'2026-04-10', actual:'', status:'Overdue', agenda:'No', minutes:'No', email:'vte@mch.sa' },
+  { id:'C013', name:'Morbidity & Mortality', dept:'Medical Administration', chair:'Dr. Hind Al-Rashidi', coord:'Eman Al-Faraj', freq:'Monthly', planned:'2026-06-25', actual:'', status:'Scheduled', agenda:'No', minutes:'No', email:'mm@mch.sa' },
+  { id:'C014', name:'Utilization Review', dept:'Health Information Mgmt', chair:'Dr. Badr Al-Amri', coord:'Wafa Al-Sulami', freq:'Monthly', planned:'2026-05-30', actual:'', status:'Delayed', agenda:'No', minutes:'No', email:'ur@mch.sa' },
+  { id:'C015', name:'Cardiopulmonary Resuscitation', dept:'Medical Administration', chair:'Dr. Sana Al-Ghamdi', coord:'Manar Al-Zahrani', freq:'Quarterly', planned:'2026-06-30', actual:'', status:'Upcoming', agenda:'No', minutes:'No', email:'cpr@mch.sa' },
+  { id:'C016', name:'Operating Room', dept:'Surgery / OR', chair:'Dr. Khalil Al-Harthi', coord:'Lamya Al-Dosari', freq:'Monthly', planned:'2026-06-14', actual:'2026-06-14', status:'Completed', agenda:'Yes', minutes:'Yes', email:'or@mch.sa' },
+  { id:'C017', name:'RRT Committee', dept:'Nursing', chair:'Dr. Amal Al-Otaibi', coord:'Sumaya Al-Bishi', freq:'Monthly', planned:'2026-04-20', actual:'', status:'Overdue', agenda:'No', minutes:'No', email:'rrt@mch.sa' },
+  { id:'C018', name:'Medical Record Review', dept:'Health Information Mgmt', chair:'Dr. Wael Al-Shehri', coord:'Hessa Al-Mutairi', freq:'Monthly', planned:'2026-06-22', actual:'', status:'Scheduled', agenda:'Yes', minutes:'No', email:'mrr@mch.sa' },
+  { id:'C019', name:'Tissue Review', dept:'Pathology / Lab', chair:'Dr. Nora Al-Qahtani', coord:'Dalal Al-Ayed', freq:'Quarterly', planned:'2026-07-10', actual:'', status:'Upcoming', agenda:'No', minutes:'No', email:'tissue@mch.sa' },
+  { id:'C020', name:'Breast Feeding', dept:'Pediatrics & Obstetrics', chair:'Dr. Hana Al-Balawi', coord:'Sara Al-Anazi', freq:'Monthly', planned:'2026-06-17', actual:'2026-06-17', status:'Completed', agenda:'Yes', minutes:'Yes', email:'bf@mch.sa' },
+  { id:'C021', name:'Clinical Audit', dept:'Quality', chair:'Dr. Turki Al-Dosari', coord:'Mona Al-Malki', freq:'Monthly', planned:'2026-06-24', actual:'', status:'Scheduled', agenda:'No', minutes:'No', email:'audit@mch.sa' },
+  { id:'C022', name:'Medical Executive Management', dept:'Medical Administration', chair:'Dr. Reem Al-Asiri', coord:'Leen Al-Shehri', freq:'Monthly', planned:'2026-06-28', actual:'', status:'Scheduled', agenda:'No', minutes:'No', email:'medexec@mch.sa' }
+];
+
+/* @section: demo-decisions */
+const DEMO_DECISIONS = [
+  { id:'D001', committee:'Patient Safety', rec:'تفعيل بروتوكول التعرف على المريض بشكل كامل', dept:'Nursing', due:'2026-06-30', pct:85, status:'inprogress' },
+  { id:'D002', committee:'Infection Prevention & Control', rec:'تحديث بروتوكولات النظافة اليدوية في جميع الأقسام', dept:'Infection Control', due:'2026-05-15', pct:100, status:'completed' },
+  { id:'D003', committee:'Quality Improvement', rec:'إطلاق برنامج جديد للسلامة الدوائية', dept:'Pharmacy', due:'2026-07-31', pct:40, status:'inprogress' },
+  { id:'D004', committee:'Pharmacy & Therapeutic', rec:'مراجعة قائمة الأدوية الحيوية وتحديثها', dept:'Pharmacy', due:'2026-04-30', pct:0, status:'delayed' },
+  { id:'D005', committee:'Hospital Executive Management', rec:'تطوير نظام المعلومات الصحية المتكامل', dept:'Health Information Mgmt', due:'2026-12-31', pct:20, status:'inprogress' },
+  { id:'D006', committee:'General Safety', rec:'إجراء تدريب إخلاء الطوارئ لجميع الكوادر', dept:'Safety & Facility Mgmt', due:'2026-06-15', pct:70, status:'inprogress' },
+  { id:'D007', committee:'Credentialing & Privileging', rec:'مراجعة ملفات اعتماد جميع الأطباء', dept:'Medical Staff Office', due:'2026-08-31', pct:30, status:'inprogress' },
+  { id:'D008', committee:'Operating Room', rec:'تطبيق قائمة التحقق الجراحي (WHO Checklist)', dept:'Surgery / OR', due:'2026-05-01', pct:100, status:'completed' },
+  { id:'D009', committee:'Morbidity & Mortality', rec:'تطوير نظام الإبلاغ عن الحوادث السريرية', dept:'Quality', due:'2026-09-30', pct:10, status:'notstarted' },
+  { id:'D010', committee:'Utilization Review', rec:'تقليل متوسط مدة الإقامة بنسبة 10%', dept:'Medical Administration', due:'2026-12-31', pct:15, status:'inprogress' },
+  { id:'D011', committee:'Breast Feeding', rec:'زيادة نسبة الرضاعة الطبيعية الحصرية إلى 60%', dept:'Pediatrics & Obstetrics', due:'2026-06-30', pct:55, status:'inprogress' },
+  { id:'D012', committee:'Clinical Audit', rec:'إجراء 4 دراسات تدقيق سريري خلال 2026', dept:'Quality', due:'2026-12-31', pct:25, status:'inprogress' },
+  { id:'D013', committee:'Medical Record Review', rec:'رفع نسبة اكتمال الوثائق الطبية إلى 95%', dept:'Health Information Mgmt', due:'2026-09-30', pct:60, status:'inprogress' },
+  { id:'D014', committee:'Antimicrobial Stewardship', rec:'تطبيق سياسة الاستخدام الرشيد للمضادات الحيوية', dept:'Pharmacy', due:'2026-04-30', pct:0, status:'delayed' },
+  { id:'D015', committee:'Patient\'s Rights / Advocacy', rec:'توزيع دليل حقوق المريض على جميع الأقسام', dept:'Patient Experience', due:'2026-03-31', pct:100, status:'completed' }
+];
+
+/* ================================================================= */
+/* @section: login-logic */
+function doLogin() {
+  const role = document.getElementById('loginRole').value;
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  if (!role) { err.style.display='block'; err.textContent='❌ اختر دورك أولاً'; return; }
+  if (ROLES[role] && ROLES[role].password === pass) {
+    currentUser = { role, ...ROLES[role] };
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('tbUserBadge').textContent = ROLES[role].icon + ' ' + ROLES[role].name;
+    err.style.display = 'none';
+    showToast('أهلاً بك ' + ROLES[role].name + ' 👋', 'success');
+    initApp();
+  } else {
+    err.style.display = 'block';
+    err.textContent = '❌ كلمة المرور غير صحيحة';
+    document.getElementById('loginPass').value = '';
+  }
+}
+document.getElementById('loginPass').addEventListener('keypress', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginRole').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+}
+
+/* ================================================================= */
+/* @section: app-init */
+function initApp() {
+  startClock();
+  applyDarkMode();
+  loadData();
+  renderDecisions();
+  renderCalendar();
+  autoRefreshTimer = setInterval(loadData, 5 * 60 * 1000);
+}
+
+/* ================================================================= */
+/* @section: clock */
+function startClock() {
+  function tick() {
+    const now = new Date();
+    const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+    const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    const el = document.getElementById('tbClock');
+    if (el) el.textContent = `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${h}:${m}:${s}`;
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+/* ================================================================= */
+/* @section: dark-mode */
+function toggleDark() {
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  localStorage.setItem(DARK_KEY, isDark);
+  document.getElementById('darkBtn').textContent = isDark ? '☀️' : '🌙';
+  const dt = document.getElementById('darkToggle');
+  if (dt) dt.checked = isDark;
+  refreshCharts();
+}
+function applyDarkMode() {
+  const saved = localStorage.getItem(DARK_KEY);
+  if (saved === 'true') {
+    document.body.classList.add('dark');
+    const db = document.getElementById('darkBtn');
+    if (db) db.textContent = '☀️';
+    const dt = document.getElementById('darkToggle');
+    if (dt) dt.checked = true;
+  }
+}
+
+/* ================================================================= */
+/* @section: navigation */
+function showPage(pageId) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('page-' + pageId);
+  if (pg) pg.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+pageId+"'")) n.classList.add('active');
+  });
+  // Re-render page-specific content
+  if (pageId === 'calendar') renderCalendar();
+  if (pageId === 'alerts') renderAlerts();
+  if (pageId === 'reports') renderReports();
+  // Close sidebar on mobile
+  if (window.innerWidth < 900) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+  }
+}
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+/* ================================================================= */
+/* @section: csv-fetch */
+async function fetchCSV(url) {
+  let fetchUrl = url.includes('?') ? url + '&_t=' + Date.now() : url + '?_t=' + Date.now();
+  if (window.location.protocol === 'file:') {
+    fetchUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(fetchUrl);
+  }
+  const resp = await fetch(fetchUrl, { cache: 'no-store' });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  return await resp.text();
+}
+
+/* @section: csv-parse */
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,'').toLowerCase().replace(/\s+/g,'_'));
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = splitCSVLine(lines[i]);
+    if (vals.length < 2) continue;
+    const obj = {};
+    headers.forEach((h, idx) => { obj[h] = (vals[idx] || '').trim().replace(/^"|"$/g,''); });
+    rows.push(obj);
+  }
+  return rows;
+}
+function splitCSVLine(line) {
+  const res = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { res.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  res.push(cur);
+  return res;
+}
+
+/* @section: normalize-row */
+function normalizeRow(row) {
+  // Map possible column names from Google Sheets to internal keys
+  const get = (keys) => {
+    for (const k of keys) { if (row[k] !== undefined && row[k] !== '') return row[k]; }
+    return '';
+  };
+  return {
+    id:       get(['id','committee_id','committee id','#']),
+    name:     get(['committee_name','committee name','name','اسم_اللجنة','اسم اللجنة']),
+    dept:     get(['department','dept','القسم','الإدارة']),
+    chair:    get(['chairperson','chair','chairman','رئيس_اللجنة','رئيس اللجنة']),
+    coord:    get(['coordinator','coord','منسق_اللجنة','المنسق']),
+    freq:     get(['meeting_frequency','frequency','freq','التكرار']),
+    planned:  get(['planned_date','planned date','تاريخ_المخطط','تاريخ مخطط']),
+    actual:   get(['actual_meeting_date','actual date','actual','تاريخ_الاجتماع_الفعلي']),
+    status:   get(['status','الحالة']),
+    agenda:   get(['agenda_prepared','agenda','الأجندة']),
+    minutes:  get(['minutes_uploaded','minutes','المحضر']),
+    email:    get(['email','البريد_الإلكتروني'])
+  };
+}
+
+/* ================================================================= */
+/* @section: load-data */
+async function connectNow() {
+  const csvUrl = document.getElementById('csvInput').value.trim() || DEFAULT_CSV;
+  document.getElementById('csvInput').value = csvUrl;
+  const statusEl = document.getElementById('tbStatus');
+  statusEl.className = 'tb-status loading';
+  statusEl.textContent = '🔄 جاري الاتصال...';
+  try {
+    const text = await fetchCSV(csvUrl);
+    const parsed = parseCSV(text);
+    if (parsed.length > 0) {
+      rawData = parsed.map(normalizeRow).filter(r => r.name);
+      if (rawData.length === 0) throw new Error('No valid rows');
+      localStorage.setItem(STORAGE_KEY, csvUrl);
+      statusEl.className = 'tb-status connected';
+      statusEl.textContent = '🟢 متصل (' + rawData.length + ' سجل)';
+      document.getElementById('lastUpdate').textContent = new Date().toLocaleString('ar-SA');
+      showToast('تم الاتصال بـ Google Sheets ✅ — ' + rawData.length + ' سجل', 'success');
+    } else {
+      throw new Error('Empty data');
+    }
+  } catch (err) {
+    console.warn('Google Sheets fetch failed, using demo data:', err.message);
+    rawData = DEMO_DATA.map(r => ({...r}));
+    statusEl.className = 'tb-status demo';
+    statusEl.textContent = '⚪ تجريبي (' + rawData.length + ' لجنة)';
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleString('ar-SA') + ' (بيانات تجريبية)';
+  }
+  document.getElementById('settingsCsvUrl').value = csvUrl;
+  renderAll();
+}
+
+function loadData() {
+  const saved = localStorage.getItem(STORAGE_KEY) || DEFAULT_CSV;
+  document.getElementById('csvInput').value = saved;
+  connectNow();
+}
+
+/* ================================================================= */
+/* @section: render-all */
+function renderAll() {
+  computeKPIs();
+  renderCommittees();
+  renderAlerts();
+  renderReports();
+  updateAlertsBadge();
+  buildCharts();
+}
+
+/* ================================================================= */
+/* @section: kpi-computation */
+function computeKPIs() {
+  const total = rawData.length;
+  const completed = rawData.filter(r => r.status.toLowerCase() === 'completed').length;
+  const scheduled = rawData.filter(r => r.status.toLowerCase() === 'scheduled').length;
+  const delayed = rawData.filter(r => ['delayed','overdue','cancelled'].includes(r.status.toLowerCase())).length;
+  const overdue = rawData.filter(r => ['overdue'].includes(r.status.toLowerCase())).length;
+  const compliance = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const in30 = new Date(now.getTime() + 30 * 86400000);
+
+  const thisMonth = rawData.filter(r => {
+    const d = parseDate(r.planned);
+    return d && d >= monthStart && d <= monthEnd;
+  }).length;
+  const upcoming30 = rawData.filter(r => {
+    const d = parseDate(r.planned);
+    return d && d >= now && d <= in30;
+  }).length;
+
+  setText('kpi-total', total);
+  setText('kpi-completed', completed);
+  setText('kpi-scheduled', scheduled);
+  setText('kpi-delayed', delayed);
+  setText('kpi-compliance', compliance + '%');
+  setText('kpi-thismonth', thisMonth);
+  setText('kpi-upcoming30', upcoming30);
+  setText('kpi-overdue', overdue);
+  setText('rpt-total', total);
+  setText('rpt-done', completed);
+  setText('rpt-rate', compliance + '%');
+
+  // Quick stats
+  const byCompliance = getCommitteeCompliance();
+  const sorted = Object.entries(byCompliance).sort((a,b) => b[1]-a[1]);
+  const top = sorted[0]; const bot = sorted[sorted.length-1];
+  setText('topCommittee', top ? shortName(top[0]) + ' (' + top[1] + '%)' : '—');
+  setText('bottomCommittee', bot ? shortName(bot[0]) + ' (' + bot[1] + '%)' : '—');
+
+  const nextMtg = rawData
+    .filter(r => { const d = parseDate(r.planned); return d && d >= now; })
+    .sort((a,b) => parseDate(a.planned) - parseDate(b.planned))[0];
+  setText('nextMeeting', nextMtg ? shortName(nextMtg.name) + ' — ' + formatDate(nextMtg.planned) : '—');
+}
+
+function getCommitteeCompliance() {
+  const result = {};
+  const names = [...new Set(rawData.map(r => r.name))];
+  names.forEach(n => {
+    const rows = rawData.filter(r => r.name === n);
+    const done = rows.filter(r => r.status.toLowerCase() === 'completed').length;
+    result[n] = rows.length > 0 ? Math.round((done / rows.length) * 100) : 0;
+  });
+  return result;
+}
+
+function getDeptCompliance() {
+  const result = {};
+  const depts = [...new Set(rawData.map(r => r.dept).filter(Boolean))];
+  depts.forEach(d => {
+    const rows = rawData.filter(r => r.dept === d);
+    const done = rows.filter(r => r.status.toLowerCase() === 'completed').length;
+    const delayed = rows.filter(r => ['delayed','overdue'].includes(r.status.toLowerCase())).length;
+    result[d] = {
+      total: rows.length,
+      done,
+      delayed,
+      pct: rows.length > 0 ? Math.round((done / rows.length) * 100) : 0,
+      committees: [...new Set(rows.map(r => r.name))].length
+    };
+  });
+  return result;
+}
+
+/* ================================================================= */
+/* @section: charts */
+function buildCharts() {
+  const isDark = document.body.classList.contains('dark');
+  const textColor = isDark ? '#cbd5e1' : '#475569';
+  const gridColor = isDark ? '#334155' : '#e2e8f0';
+  Chart.defaults.color = textColor;
+  Chart.defaults.borderColor = gridColor;
+
+  destroyCharts();
+
+  // Monthly trend
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const monthCounts = Array(12).fill(0);
+  rawData.filter(r => r.status.toLowerCase() === 'completed').forEach(r => {
+    const d = parseDate(r.actual || r.planned);
+    if (d) { const m = d.getMonth(); if(d.getFullYear() === 2026) monthCounts[m]++; }
+  });
+  createChart('chartTrend', 'line', months, [{
+    label: 'اجتماعات منعقدة',
+    data: monthCounts,
+    borderColor: '#14B8A6',
+    backgroundColor: 'rgba(20,184,166,0.1)',
+    fill: true,
+    tension: 0.4,
+    pointBackgroundColor: '#14B8A6',
+    pointRadius: 4
+  }], { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } });
+
+  // Status doughnut
+  const statusMap = { 'Completed':0,'Scheduled':0,'Delayed':0,'Overdue':0,'Upcoming':0,'Cancelled':0 };
+  rawData.forEach(r => {
+    const s = r.status;
+    if (statusMap[s] !== undefined) statusMap[s]++;
+    else statusMap['Scheduled']++;
+  });
+  const statusLabels = Object.keys(statusMap).filter(k => statusMap[k] > 0);
+  const statusVals = statusLabels.map(k => statusMap[k]);
+  const statusColors = { Completed:'#22c55e', Scheduled:'#3b82f6', Delayed:'#f59e0b', Overdue:'#ef4444', Upcoming:'#8b5cf6', Cancelled:'#94a3b8' };
+  createChart('chartStatus', 'doughnut', statusLabels.map(s=>({Completed:'مكتملة',Scheduled:'مجدولة',Delayed:'متأخرة',Overdue:'متأخرة جداً',Upcoming:'قادمة',Cancelled:'ملغاة'})[s]||s), [{
+    data: statusVals,
+    backgroundColor: statusLabels.map(s => statusColors[s]||'#94a3b8'),
+    borderWidth: 2,
+    borderColor: isDark ? '#1e293b' : '#fff'
+  }], { plugins: { legend: { position: 'bottom', labels: { font:{size:10}, padding:8 } } } });
+
+  // Dept bar horizontal
+  const deptData = getDeptCompliance();
+  const deptNames = Object.keys(deptData).slice(0, 15);
+  const deptPcts = deptNames.map(d => deptData[d].pct);
+  const deptColors = deptPcts.map(p => p >= 80 ? '#22c55e' : p >= 50 ? '#f59e0b' : '#ef4444');
+  createChart('chartDept', 'bar', deptNames.map(d => shortDept(d)), [{
+    label: 'نسبة الالتزام %',
+    data: deptPcts,
+    backgroundColor: deptColors,
+    borderRadius: 4
+  }], {
+    indexAxis: 'y',
+    scales: {
+      x: { beginAtZero: true, max: 100, ticks: { callback: v => v+'%' } },
+      y: { ticks: { font: { size: 9 } } }
+    },
+    plugins: { legend: { display: false } }
+  });
+
+  // Compare bar (conducted vs planned by committee - sample 10)
+  const sample = rawData.slice(0, 10);
+  const compareNames = sample.map(r => shortName(r.name));
+  const conductedData = sample.map(r => r.status.toLowerCase() === 'completed' ? 1 : 0);
+  const plannedData = sample.map(() => 1);
+  createChart('chartCompare', 'bar', compareNames, [
+    { label: 'مخطط', data: plannedData, backgroundColor: 'rgba(15,76,129,0.4)', borderRadius: 4 },
+    { label: 'منعقد', data: conductedData, backgroundColor: 'rgba(20,184,166,0.7)', borderRadius: 4 }
+  ], {
+    scales: { y: { beginAtZero: true, max: 2, ticks: { stepSize: 1 } } },
+    plugins: { legend: { position: 'bottom' } }
+  });
+
+  // Radar
+  const depts = Object.keys(deptData);
+  const top5 = depts.sort((a,b) => deptData[b].pct - deptData[a].pct).slice(0, 6);
+  createChart('chartRadar', 'radar', top5.map(d => shortDept(d)), [{
+    label: 'نسبة الالتزام %',
+    data: top5.map(d => deptData[d].pct),
+    borderColor: '#0F4C81',
+    backgroundColor: 'rgba(15,76,129,0.15)',
+    pointBackgroundColor: '#0F4C81'
+  }], {
+    scales: { r: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } } }
+  });
+
+  // Reports charts
+  const compData = getCommitteeCompliance();
+  const compNames = Object.keys(compData).slice(0, 12);
+  createChart('chartReportCompliance', 'bar', compNames.map(n => shortName(n)), [{
+    label: 'الالتزام %',
+    data: compNames.map(n => compData[n]),
+    backgroundColor: compNames.map(n => compData[n] >= 80 ? '#22c55e' : compData[n] >= 50 ? '#f59e0b' : '#ef4444'),
+    borderRadius: 4
+  }], {
+    scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v+'%' } } },
+    plugins: { legend: { display: false } }
+  });
+
+  createChart('chartReportStatus', 'pie', statusLabels.map(s=>({Completed:'مكتملة',Scheduled:'مجدولة',Delayed:'متأخرة',Overdue:'متأخرة جداً',Upcoming:'قادمة',Cancelled:'ملغاة'})[s]||s), [{
+    data: statusVals,
+    backgroundColor: statusLabels.map(s => statusColors[s]||'#94a3b8'),
+    borderWidth: 2
+  }]);
+
+  const deptForReport = Object.keys(deptData);
+  createChart('chartReportDept', 'bar', deptForReport.map(d => shortDept(d)), [{
+    label: 'نسبة الالتزام %',
+    data: deptForReport.map(d => deptData[d].pct),
+    backgroundColor: deptForReport.map(d => deptData[d].pct >= 80 ? '#22c55e' : deptData[d].pct >= 50 ? '#f59e0b' : '#ef4444'),
+    borderRadius: 4
+  }], {
+    scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v+'%' } } },
+    plugins: { legend: { display: false } }
+  });
+}
+
+function createChart(id, type, labels, datasets, extraOpts = {}) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  const isDark = document.body.classList.contains('dark');
+  const ctx = canvas.getContext('2d');
+  const baseOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { font: { family: 'Tajawal', size: 11 }, color: isDark ? '#cbd5e1' : '#475569' } },
+      tooltip: {
+        titleFont: { family: 'Tajawal' },
+        bodyFont: { family: 'Tajawal' }
+      }
+    }
+  };
+  const opts = deepMerge(baseOpts, extraOpts);
+  charts[id] = new Chart(ctx, { type, data: { labels, datasets }, options: opts });
+}
+
+function destroyCharts() {
+  Object.values(charts).forEach(c => { try { c.destroy(); } catch(e){} });
+  charts = {};
+}
+
+function refreshCharts() { if (rawData.length) buildCharts(); }
+
+function deepMerge(target, source) {
+  const out = Object.assign({}, target);
+  for (const key in source) {
+    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      out[key] = deepMerge(target[key] || {}, source[key]);
+    } else {
+      out[key] = source[key];
+    }
+  }
+  return out;
+}
+
+/* ================================================================= */
+/* @section: committees-table */
+function renderCommittees() {
+  const search = (document.getElementById('searchCommittees') || {}).value || '';
+  const deptF = (document.getElementById('filterDept') || {}).value || '';
+  const statusF = (document.getElementById('filterStatus') || {}).value || '';
+  const compF = (document.getElementById('filterCompliance') || {}).value || '';
+
+  // Populate dept dropdown
+  const deptSel = document.getElementById('filterDept');
+  if (deptSel && deptSel.options.length <= 1) {
+    const depts = [...new Set(rawData.map(r => r.dept).filter(Boolean))].sort();
+    depts.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d; opt.textContent = d;
+      deptSel.appendChild(opt);
+    });
+  }
+
+  const compMap = getCommitteeCompliance();
+
+  filteredCommittees = rawData.filter(r => {
+    const s = search.toLowerCase();
+    if (s && !r.name.toLowerCase().includes(s) && !r.chair.toLowerCase().includes(s) && !r.dept.toLowerCase().includes(s)) return false;
+    if (deptF && r.dept !== deptF) return false;
+    if (statusF && r.status.toLowerCase() !== statusF.toLowerCase()) return false;
+    if (compF) {
+      const pct = compMap[r.name] || 0;
+      if (compF === 'high' && pct < 80) return false;
+      if (compF === 'mid' && (pct < 50 || pct >= 80)) return false;
+      if (compF === 'low' && pct >= 50) return false;
+    }
+    return true;
+  });
+
+  document.getElementById('committeesCount').textContent = filteredCommittees.length + ' من ' + rawData.length + ' سجل';
+  renderCommitteesPage();
+}
+
+function renderCommitteesPage() {
+  const start = (committeesPage - 1) * ITEMS_PER_PAGE;
+  const end = start + ITEMS_PER_PAGE;
+  const pageData = filteredCommittees.slice(start, end);
+  const compMap = getCommitteeCompliance();
+  const tbody = document.getElementById('committeesBody');
+
+  if (pageData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="13" class="text-center" style="padding:40px; color:var(--muted)">🔍 لا توجد نتائج تطابق البحث</td></tr>';
+    document.getElementById('committeesPageInfo').textContent = '';
+    document.getElementById('committeesPagination').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = pageData.map((r, i) => {
+    const globalIdx = start + i + 1;
+    const pct = compMap[r.name] || 0;
+    const statusBadge = getStatusBadge(r.status);
+    const compColor = pct >= 80 ? 'success' : pct >= 50 ? 'warning' : 'danger';
+    return `<tr>
+      <td style="color:var(--muted); font-size:0.78rem">${globalIdx}</td>
+      <td style="font-weight:600; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis" title="${r.name}">${shortName(r.name)}</td>
+      <td style="font-size:0.8rem">${shortDept(r.dept)}</td>
+      <td style="font-size:0.8rem">${r.chair || '—'}</td>
+      <td style="font-size:0.8rem; color:var(--muted)">${r.coord || '—'}</td>
+      <td><span class="badge badge-muted" style="font-size:0.7rem">${translateFreq(r.freq)}</span></td>
+      <td style="font-size:0.8rem">${formatDate(r.planned)}</td>
+      <td style="font-size:0.8rem">${r.actual ? formatDate(r.actual) : '—'}</td>
+      <td>
+        <div class="compliance-bar-wrap">
+          <div class="compliance-bar"><div class="compliance-bar-fill" style="width:${pct}%; background:var(--${compColor}=='success'?'success':compColor=='warning'?'warning':'danger')"></div></div>
+          <span class="compliance-pct" style="color:${pct>=80?'var(--success)':pct>=50?'var(--warning)':'var(--danger)'}">${pct}%</span>
+        </div>
+      </td>
+      <td style="font-size:0.78rem; color:var(--muted)">${r.actual ? formatDate(r.actual) : '—'}</td>
+      <td style="font-size:0.78rem">${formatDate(r.planned)}</td>
+      <td>${statusBadge}</td>
+      <td>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="showCommitteeDetail(${start+i})" title="تفاصيل">👁</button>
+        ${r.email ? `<button class="btn btn-accent btn-sm btn-icon" onclick="sendReminder('${r.email}','${r.name.replace(/'/g,'')}','${r.planned}')" title="إرسال تذكير">📧</button>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Pagination
+  const totalPages = Math.ceil(filteredCommittees.length / ITEMS_PER_PAGE);
+  document.getElementById('committeesPageInfo').textContent = `عرض ${start+1}–${Math.min(end, filteredCommittees.length)} من ${filteredCommittees.length}`;
+  const pgBtns = document.getElementById('committeesPagination');
+  pgBtns.innerHTML = '';
+  for (let p = 1; p <= totalPages; p++) {
+    const btn = document.createElement('button');
+    btn.className = 'pg-btn' + (p === committeesPage ? ' active' : '');
+    btn.textContent = p;
+    btn.onclick = () => { committeesPage = p; renderCommitteesPage(); };
+    pgBtns.appendChild(btn);
+  }
+}
+
+function filterCommittees() { committeesPage = 1; renderCommittees(); }
+function clearFilters() {
+  document.getElementById('searchCommittees').value = '';
+  document.getElementById('filterDept').value = '';
+  document.getElementById('filterStatus').value = '';
+  document.getElementById('filterCompliance').value = '';
+  filterCommittees();
+}
+
+function showCommitteeDetail(idx) {
+  const r = filteredCommittees[idx];
+  if (!r) return;
+  const pct = getCommitteeCompliance()[r.name] || 0;
+  document.getElementById('modalTitle').textContent = '👥 ' + r.name;
+  document.getElementById('modalContent').innerHTML = `
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">القسم</div><div class="info-value">${r.dept||'—'}</div></div>
+      <div class="info-item"><div class="info-label">رئيس اللجنة</div><div class="info-value">${r.chair||'—'}</div></div>
+      <div class="info-item"><div class="info-label">المنسق</div><div class="info-value">${r.coord||'—'}</div></div>
+      <div class="info-item"><div class="info-label">التكرار</div><div class="info-value">${translateFreq(r.freq)}</div></div>
+      <div class="info-item"><div class="info-label">تاريخ مخطط</div><div class="info-value">${formatDate(r.planned)}</div></div>
+      <div class="info-item"><div class="info-label">تاريخ فعلي</div><div class="info-value">${r.actual?formatDate(r.actual):'—'}</div></div>
+      <div class="info-item"><div class="info-label">الحالة</div><div class="info-value">${getStatusBadge(r.status)}</div></div>
+      <div class="info-item"><div class="info-label">نسبة الالتزام</div><div class="info-value" style="color:${pct>=80?'var(--success)':pct>=50?'var(--warning)':'var(--danger)'}">${pct}%</div></div>
+      <div class="info-item"><div class="info-label">الأجندة</div><div class="info-value">${r.agenda==='Yes'?'<span class="badge badge-success">✅ محضّرة</span>':'<span class="badge badge-danger">❌ غير محضّرة</span>'}</div></div>
+      <div class="info-item"><div class="info-label">المحضر</div><div class="info-value">${r.minutes==='Yes'?'<span class="badge badge-success">✅ مرفوع</span>':'<span class="badge badge-danger">❌ غير مرفوع</span>'}</div></div>
+      <div class="info-item"><div class="info-label">البريد الإلكتروني</div><div class="info-value" style="font-size:0.82rem; direction:ltr">${r.email||'—'}</div></div>
+    </div>`;
+  if (r.email) {
+    const btn = document.getElementById('modalAction');
+    btn.style.display = 'inline-flex';
+    btn.textContent = '📧 إرسال تذكير';
+    btn.onclick = () => { sendReminder(r.email, r.name, r.planned); closeModalDirect(); };
+  } else {
+    document.getElementById('modalAction').style.display = 'none';
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+/* ================================================================= */
+/* @section: decisions */
+function renderDecisions() {
+  const search = (document.getElementById('searchDecisions')||{}).value||'';
+  const statusF = (document.getElementById('filterDecStatus')||{}).value||'';
+  const filtered = DEMO_DECISIONS.filter(d => {
+    if (search && !d.rec.toLowerCase().includes(search.toLowerCase()) && !d.committee.toLowerCase().includes(search.toLowerCase())) return false;
+    if (statusF && d.status !== statusF) return false;
+    return true;
+  });
+  const tbody = document.getElementById('decisionsBody');
+  if (!tbody) return;
+  tbody.innerHTML = filtered.map((d, i) => {
+    const statusInfo = {
+      completed: { label:'مكتمل', cls:'badge-success', icon:'🟢' },
+      inprogress: { label:'قيد التنفيذ', cls:'badge-warning', icon:'🟡' },
+      delayed: { label:'متأخر', cls:'badge-danger', icon:'🔴' },
+      notstarted: { label:'لم يبدأ', cls:'badge-muted', icon:'⚫' }
+    }[d.status] || { label: d.status, cls:'badge-muted', icon:'⚪' };
+    const pctColor = d.pct >= 80 ? 'var(--success)' : d.pct >= 40 ? 'var(--warning)' : 'var(--danger)';
+    return `<tr>
+      <td style="color:var(--muted); font-size:0.78rem">${i+1}</td>
+      <td style="font-size:0.82rem; font-weight:600">${shortName(d.committee)}</td>
+      <td style="max-width:200px; font-size:0.85rem">${d.rec}</td>
+      <td style="font-size:0.82rem">${d.dept}</td>
+      <td style="font-size:0.8rem">${formatDate(d.due)}</td>
+      <td style="min-width:120px">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar"><div class="progress-fill" style="width:${d.pct}%; background:${pctColor}"></div></div>
+          <span style="font-size:0.78rem; font-weight:700; color:${pctColor}; min-width:30px">${d.pct}%</span>
+        </div>
+      </td>
+      <td><span class="badge ${statusInfo.cls}">${statusInfo.icon} ${statusInfo.label}</span></td>
+      <td>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="showDecisionDetail(${i})" title="تفاصيل">👁</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterDecisions() { renderDecisions(); }
+
+function showDecisionDetail(idx) {
+  const d = DEMO_DECISIONS[idx];
+  if (!d) return;
+  document.getElementById('modalTitle').textContent = '📋 ' + d.id;
+  const statusMap = { completed:'🟢 مكتمل', inprogress:'🟡 قيد التنفيذ', delayed:'🔴 متأخر', notstarted:'⚫ لم يبدأ' };
+  document.getElementById('modalContent').innerHTML = `
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">اللجنة</div><div class="info-value">${d.committee}</div></div>
+      <div class="info-item"><div class="info-label">الإدارة المسؤولة</div><div class="info-value">${d.dept}</div></div>
+      <div class="info-item"><div class="info-label">تاريخ الاستحقاق</div><div class="info-value">${formatDate(d.due)}</div></div>
+      <div class="info-item"><div class="info-label">نسبة الإنجاز</div><div class="info-value" style="color:var(--accent)">${d.pct}%</div></div>
+      <div class="info-item" style="grid-column:1/-1"><div class="info-label">التوصية / القرار</div><div class="info-value" style="font-size:0.9rem; line-height:1.6">${d.rec}</div></div>
+      <div class="info-item"><div class="info-label">الحالة</div><div class="info-value">${statusMap[d.status]||d.status}</div></div>
+    </div>`;
+  document.getElementById('modalAction').style.display = 'none';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+/* ================================================================= */
+/* @section: alerts */
+function renderAlerts() {
+  const now = new Date();
+  const in3 = new Date(now.getTime() + 3 * 86400000);
+  const in7 = new Date(now.getTime() + 7 * 86400000);
+
+  const overdue = rawData.filter(r => ['overdue','delayed'].includes(r.status.toLowerCase()));
+  const within3 = rawData.filter(r => {
+    const d = parseDate(r.planned);
+    return d && d >= now && d <= in3 && r.status.toLowerCase() !== 'completed';
+  });
+  const within7 = rawData.filter(r => {
+    const d = parseDate(r.planned);
+    return d && d > in3 && d <= in7 && r.status.toLowerCase() !== 'completed';
+  });
+  const overdueDecisions = DEMO_DECISIONS.filter(d => {
+    const due = parseDate(d.due);
+    return due && due < now && d.status !== 'completed';
+  });
+
+  const grid = document.getElementById('alertsGrid');
+  if (!grid) return;
+
+  grid.innerHTML = `
+    <div class="alert-section-card">
+      <div class="alert-section-header red">🔴 اجتماعات متأخرة (${overdue.length})</div>
+      ${overdue.length === 0 ? '<div class="alert-empty">✅ لا توجد اجتماعات متأخرة</div>' :
+        overdue.map(r => `<div class="alert-item">
+          <div><div class="alert-item-name">${shortName(r.name)}</div><div class="alert-item-sub">${r.dept} | ${formatDate(r.planned)}</div></div>
+          ${r.email ? `<button class="btn btn-danger btn-sm" onclick="sendReminder('${r.email}','${r.name.replace(/'/g,'')}','${r.planned}')">📧</button>` : ''}
+        </div>`).join('')}
+    </div>
+    <div class="alert-section-card">
+      <div class="alert-section-header yellow">🟡 خلال 3 أيام (${within3.length})</div>
+      ${within3.length === 0 ? '<div class="alert-empty">✅ لا توجد اجتماعات خلال 3 أيام</div>' :
+        within3.map(r => `<div class="alert-item">
+          <div><div class="alert-item-name">${shortName(r.name)}</div><div class="alert-item-sub">${r.dept} | ${formatDate(r.planned)}</div></div>
+          ${r.email ? `<button class="btn btn-outline btn-sm" onclick="sendReminder('${r.email}','${r.name.replace(/'/g,'')}','${r.planned}')">📧</button>` : ''}
+        </div>`).join('')}
+    </div>
+    <div class="alert-section-card">
+      <div class="alert-section-header orange">🟠 خلال 7 أيام (${within7.length})</div>
+      ${within7.length === 0 ? '<div class="alert-empty">✅ لا توجد اجتماعات خلال 7 أيام</div>' :
+        within7.map(r => `<div class="alert-item">
+          <div><div class="alert-item-name">${shortName(r.name)}</div><div class="alert-item-sub">${r.dept} | ${formatDate(r.planned)}</div></div>
+        </div>`).join('')}
+    </div>
+    <div class="alert-section-card">
+      <div class="alert-section-header blue">🔵 قرارات متأخرة (${overdueDecisions.length})</div>
+      ${overdueDecisions.length === 0 ? '<div class="alert-empty">✅ لا توجد قرارات متأخرة</div>' :
+        overdueDecisions.map(d => `<div class="alert-item">
+          <div><div class="alert-item-name">${shortName(d.committee)}</div><div class="alert-item-sub">${d.rec.substring(0,50)}... | استحق: ${formatDate(d.due)}</div></div>
+        </div>`).join('')}
+    </div>`;
+  updateAlertsBadge();
+}
+
+function updateAlertsBadge() {
+  const now = new Date();
+  const cnt = rawData.filter(r => ['overdue','delayed'].includes(r.status.toLowerCase())).length +
+              DEMO_DECISIONS.filter(d => { const due=parseDate(d.due); return due && due < now && d.status!=='completed'; }).length;
+  const badge = document.getElementById('alertsBadge');
+  if (badge) badge.textContent = cnt || '0';
+}
+
+function sendBulkReminder() {
+  const overdueEmails = rawData.filter(r => ['overdue','delayed'].includes(r.status.toLowerCase()) && r.email).map(r => r.email).join(';');
+  const subject = encodeURIComponent('تذكير عاجل: اجتماعات متأخرة - مستشفى الولادة والأطفال');
+  const body = encodeURIComponent('السلام عليكم،\n\nيُرجى مراجعة الاجتماعات المتأخرة وتحديد موعد جديد.\n\nإدارة الجودة - MCH حفر الباطن');
+  if (overdueEmails) {
+    window.location.href = `mailto:${overdueEmails}?cc=qad.mch@gmail.com&subject=${subject}&body=${body}`;
+  } else {
+    showToast('لا توجد اجتماعات متأخرة حالياً', 'info');
+  }
+}
+
+function sendReminder(email, name, date) {
+  const subject = encodeURIComponent(`تذكير: اجتماع لجنة ${name} بتاريخ ${date}`);
+  const body = encodeURIComponent(`السلام عليكم،\n\nنود تذكيركم بانعقاد اجتماع لجنة: ${name}\nالتاريخ المخطط: ${date}\n\nيرجى التأكيد والاستعداد.\n\nإدارة الجودة - مستشفى الولادة والأطفال حفر الباطن`);
+  window.location.href = `mailto:${email}?cc=qad.mch@gmail.com&subject=${subject}&body=${body}`;
+}
+
+/* ================================================================= */
+/* @section: calendar */
+function renderCalendar() {
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  document.getElementById('calTitle').textContent = months[calMonth] + ' ' + calYear;
+
+  const cells = document.getElementById('calCells');
+  if (!cells) return;
+  cells.innerHTML = '';
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date();
+
+  // Events map
+  const events = {};
+  rawData.forEach(r => {
+    const d = parseDate(r.planned);
+    if (d && d.getFullYear() === calYear && d.getMonth() === calMonth) {
+      const key = d.getDate();
+      if (!events[key]) events[key] = [];
+      events[key].push(r);
+    }
+  });
+
+  // Previous month days
+  const prevDays = new Date(calYear, calMonth, 0).getDate();
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell other-month';
+    cell.innerHTML = `<div class="cal-cell-date">${prevDays - i}</div>`;
+    cells.appendChild(cell);
+  }
+
+  // Current month days
+  for (let day = 1; day <= daysInMonth; day++) {
+    const cell = document.createElement('div');
+    const isToday = today.getDate() === day && today.getMonth() === calMonth && today.getFullYear() === calYear;
+    cell.className = 'cal-cell' + (isToday ? ' today' : '');
+
+    const dateNum = document.createElement('div');
+    dateNum.className = 'cal-cell-date';
+    if (isToday) {
+      dateNum.innerHTML = `<span class="today-num">${day}</span>`;
+    } else {
+      dateNum.textContent = day;
+    }
+    cell.appendChild(dateNum);
+
+    if (events[day]) {
+      events[day].slice(0, 3).forEach(ev => {
+        const evEl = document.createElement('div');
+        const cls = ev.status.toLowerCase();
+        evEl.className = `cal-event ${['completed','scheduled','delayed','upcoming','cancelled'].includes(cls)?cls:'scheduled'}`;
+        evEl.textContent = shortName(ev.name, 20);
+        evEl.title = ev.name + ' — ' + ev.status;
+        evEl.onclick = (e) => { e.stopPropagation(); showCalEvent(ev); };
+        cell.appendChild(evEl);
+      });
+      if (events[day].length > 3) {
+        const more = document.createElement('div');
+        more.style.cssText = 'font-size:0.65rem; color:var(--muted); padding:1px 4px';
+        more.textContent = '+' + (events[day].length - 3) + ' أخرى';
+        cell.appendChild(more);
+      }
+    }
+    cells.appendChild(cell);
+  }
+
+  // Next month days
+  const totalCells = firstDay + daysInMonth;
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let i = 1; i <= remaining; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell other-month';
+    cell.innerHTML = `<div class="cal-cell-date">${i}</div>`;
+    cells.appendChild(cell);
+  }
+}
+
+function showCalEvent(ev) {
+  document.getElementById('modalTitle').textContent = '📅 ' + ev.name;
+  document.getElementById('modalContent').innerHTML = `
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">القسم</div><div class="info-value">${ev.dept||'—'}</div></div>
+      <div class="info-item"><div class="info-label">رئيس اللجنة</div><div class="info-value">${ev.chair||'—'}</div></div>
+      <div class="info-item"><div class="info-label">التاريخ المخطط</div><div class="info-value">${formatDate(ev.planned)}</div></div>
+      <div class="info-item"><div class="info-label">الحالة</div><div class="info-value">${getStatusBadge(ev.status)}</div></div>
+      <div class="info-item"><div class="info-label">الأجندة</div><div class="info-value">${ev.agenda==='Yes'?'✅ محضّرة':'❌ غير محضّرة'}</div></div>
+      <div class="info-item"><div class="info-label">المحضر</div><div class="info-value">${ev.minutes==='Yes'?'✅ مرفوع':'❌ غير مرفوع'}</div></div>
+    </div>`;
+  if (ev.email) {
+    const btn = document.getElementById('modalAction');
+    btn.style.display = 'inline-flex';
+    btn.textContent = '📧 إرسال تذكير';
+    btn.onclick = () => sendReminder(ev.email, ev.name, ev.planned);
+  } else {
+    document.getElementById('modalAction').style.display = 'none';
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function calPrev() {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+function calNext() {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+function setCalView(view, btn) {
+  calView = view;
+  document.querySelectorAll('.cal-view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCalendar();
+}
+
+/* ================================================================= */
+/* @section: reports */
+function renderReports() {
+  // Compliance table
+  const compMap = getCommitteeCompliance();
+  const uniqueNames = [...new Set(rawData.map(r => r.name))];
+  const tbody = document.getElementById('reportComplianceBody');
+  if (tbody) {
+    tbody.innerHTML = uniqueNames.map((name, i) => {
+      const rows = rawData.filter(r => r.name === name);
+      const done = rows.filter(r => r.status.toLowerCase() === 'completed').length;
+      const delayed = rows.filter(r => ['delayed','overdue'].includes(r.status.toLowerCase())).length;
+      const pct = compMap[name] || 0;
+      const cls = pct >= 80 ? 'badge-success' : pct >= 50 ? 'badge-warning' : 'badge-danger';
+      const icon = pct >= 80 ? '🟢' : pct >= 50 ? '🟡' : '🔴';
+      return `<tr>
+        <td style="color:var(--muted)">${i+1}</td>
+        <td style="font-weight:600; font-size:0.85rem">${shortName(name)}</td>
+        <td style="font-size:0.8rem">${rows[0]?.dept||'—'}</td>
+        <td style="text-align:center">${rows.length}</td>
+        <td style="text-align:center; color:var(--success); font-weight:700">${done}</td>
+        <td style="text-align:center; color:var(--danger); font-weight:700">${delayed}</td>
+        <td style="text-align:center">
+          <div class="compliance-bar-wrap">
+            <div class="compliance-bar"><div class="compliance-bar-fill" style="width:${pct}%; background:${pct>=80?'var(--success)':pct>=50?'var(--warning)':'var(--danger)'}"></div></div>
+            <span style="font-size:0.82rem; font-weight:700; color:${pct>=80?'var(--success)':pct>=50?'var(--warning)':'var(--danger)'}">${pct}%</span>
+          </div>
+        </td>
+        <td><span class="badge ${cls}">${icon} ${pct>=80?'ملتزمة':pct>=50?'تحتاج متابعة':'متأخرة'}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Dept table
+  const deptData = getDeptCompliance();
+  const deptTbody = document.getElementById('reportDeptBody');
+  if (deptTbody) {
+    deptTbody.innerHTML = Object.entries(deptData).map(([dept, d], i) => {
+      const cls = d.pct >= 80 ? 'badge-success' : d.pct >= 50 ? 'badge-warning' : 'badge-danger';
+      const icon = d.pct >= 80 ? '🟢' : d.pct >= 50 ? '🟡' : '🔴';
+      return `<tr>
+        <td style="color:var(--muted)">${i+1}</td>
+        <td style="font-weight:600">${dept}</td>
+        <td style="text-align:center">${d.committees}</td>
+        <td style="text-align:center">${d.total}</td>
+        <td style="text-align:center; color:var(--success); font-weight:700">${d.done}</td>
+        <td style="text-align:center; color:var(--danger); font-weight:700">${d.delayed}</td>
+        <td>
+          <div class="compliance-bar-wrap">
+            <div class="compliance-bar"><div class="compliance-bar-fill" style="width:${d.pct}%; background:${d.pct>=80?'var(--success)':d.pct>=50?'var(--warning)':'var(--danger)'}"></div></div>
+            <span style="font-size:0.82rem; font-weight:700">${d.pct}%</span>
+          </div>
+        </td>
+        <td><span class="badge ${cls}">${icon}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Executive report
+  const execEl = document.getElementById('execReportBody');
+  if (execEl) {
+    const total = rawData.length;
+    const completed = rawData.filter(r => r.status.toLowerCase() === 'completed').length;
+    const delayed = rawData.filter(r => ['delayed','overdue'].includes(r.status.toLowerCase())).length;
+    const compliance = total > 0 ? Math.round((completed/total)*100) : 0;
+    const compList = getCommitteeCompliance();
+    const topC = Object.entries(compList).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const botC = Object.entries(compList).sort((a,b)=>a[1]-b[1]).slice(0,3);
+    const deptComp = getDeptCompliance();
+    const topD = Object.entries(deptComp).sort((a,b)=>b[1].pct-a[1].pct).slice(0,3);
+    const botD = Object.entries(deptComp).sort((a,b)=>a[1].pct-b[1].pct).slice(0,3);
+    const now = new Date();
+    execEl.innerHTML = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px">
+        <div style="background:rgba(20,184,166,0.07); border-radius:var(--radius-sm); padding:16px; border:1px solid rgba(20,184,166,0.2)">
+          <div style="font-size:0.85rem; font-weight:700; color:var(--accent); margin-bottom:12px">✅ أبرز الإنجازات</div>
+          <ul style="list-style:none; font-size:0.85rem; color:var(--text2); line-height:2">
+            <li>• إجمالي الاجتماعات المنجزة: <strong>${completed}</strong> من ${total}</li>
+            <li>• نسبة الالتزام العامة: <strong style="color:var(--success)">${compliance}%</strong></li>
+            <li>• أعلى لجنة: <strong>${topC[0] ? topC[0][0] : '—'}</strong> (${topC[0]?topC[0][1]:0}%)</li>
+            <li>• أعلى قسم: <strong>${topD[0] ? topD[0][0] : '—'}</strong> (${topD[0]?topD[0][1].pct:0}%)</li>
+          </ul>
+        </div>
+        <div style="background:rgba(239,68,68,0.05); border-radius:var(--radius-sm); padding:16px; border:1px solid rgba(239,68,68,0.15)">
+          <div style="font-size:0.85rem; font-weight:700; color:var(--danger); margin-bottom:12px">⚠️ نقاط تحتاج تحسين</div>
+          <ul style="list-style:none; font-size:0.85rem; color:var(--text2); line-height:2">
+            <li>• اجتماعات متأخرة: <strong style="color:var(--danger)">${delayed}</strong></li>
+            <li>• أقل لجنة التزاماً: <strong>${botC[0] ? botC[0][0] : '—'}</strong> (${botC[0]?botC[0][1]:0}%)</li>
+            <li>• أقل قسم التزاماً: <strong>${botD[0] ? botD[0][0] : '—'}</strong> (${botD[0]?botD[0][1].pct:0}%)</li>
+            <li>• قرارات متأخرة: <strong>${DEMO_DECISIONS.filter(d => { const due=parseDate(d.due); return due && due < now && d.status!=='completed'; }).length}</strong></li>
+          </ul>
+        </div>
+      </div>
+      <div style="background:rgba(15,76,129,0.05); border-radius:var(--radius-sm); padding:16px; border:1px solid rgba(15,76,129,0.15); margin-bottom:16px">
+        <div style="font-size:0.85rem; font-weight:700; color:var(--primary); margin-bottom:10px">📋 التوصيات للإدارة العليا</div>
+        <ol style="padding-right:20px; font-size:0.85rem; color:var(--text2); line-height:2.2">
+          <li>تكثيف المتابعة مع اللجان ذات الالتزام المنخفض وتحديد أسباب التأخير.</li>
+          <li>مراجعة جدول الاجتماعات للجان المتأخرة وإعادة جدولتها خلال الأسبوعين القادمين.</li>
+          <li>تعزيز آلية التذكيرات التلقائية لضمان التزام رؤساء اللجان والمنسقين.</li>
+          <li>عقد اجتماع ربعي مع رؤساء الأقسام لمراجعة مؤشرات الأداء والالتزام.</li>
+          <li>توثيق جميع قرارات اللجان وربطها بمسؤولين وتواريخ استحقاق واضحة.</li>
+        </ol>
+      </div>
+      <div style="font-size:0.78rem; color:var(--muted); text-align:center; padding:8px">
+        تم إنشاء هذا التقرير تلقائياً بواسطة نظام متابعة اللجان | ${now.toLocaleDateString('ar-SA')} | إدارة الجودة — MCH حفر الباطن
+      </div>`;
+  }
+}
+
+function switchReportTab(tab, btn) {
+  document.querySelectorAll('.report-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.report-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('rp-' + tab).classList.add('active');
+}
+
+/* ================================================================= */
+/* @section: settings-funcs */
+function saveAndConnect() {
+  const url = document.getElementById('settingsCsvUrl').value.trim();
+  if (url) {
+    document.getElementById('csvInput').value = url;
+    localStorage.setItem(STORAGE_KEY, url);
+    connectNow();
+    showToast('تم حفظ الرابط والاتصال...', 'info');
+  } else {
+    showToast('يرجى إدخال رابط CSV', 'warning');
+  }
+}
+function testConnection() {
+  const url = document.getElementById('settingsCsvUrl').value.trim() || DEFAULT_CSV;
+  showToast('🔄 جاري اختبار الاتصال...', 'info');
+  fetchCSV(url).then(text => {
+    const rows = parseCSV(text);
+    showToast('✅ الاتصال ناجح — ' + rows.length + ' سجل', 'success');
+  }).catch(err => showToast('❌ فشل الاتصال: ' + err.message, 'error'));
+}
+function fillDefaultURL() {
+  document.getElementById('settingsCsvUrl').value = DEFAULT_CSV;
+  showToast('تم ملء الرابط الافتراضي', 'info');
+}
+function clearCache() {
+  localStorage.removeItem(STORAGE_KEY);
+  showToast('تم مسح الذاكرة المؤقتة ✅', 'success');
+}
+function resetSettings() {
+  localStorage.clear();
+  showToast('تم إعادة ضبط الإعدادات — سيتم إعادة تحميل الصفحة', 'info');
+  setTimeout(() => location.reload(), 1500);
+}
+
+/* ================================================================= */
+/* @section: modal */
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+/* ================================================================= */
+/* @section: export */
+function exportTableCSV(tableId, filename) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  const rows = [...table.querySelectorAll('tr')];
+  const csv = rows.map(row =>
+    [...row.querySelectorAll('th, td')].map(cell =>
+      '"' + cell.textContent.trim().replace(/"/g,'""') + '"'
+    ).join(',')
+  ).join('\n');
+  downloadCSV(csv, filename + '_' + new Date().toISOString().split('T')[0] + '.csv');
+}
+function exportReportCSV() {
+  const deptData = getDeptCompliance();
+  let csv = '"القسم","عدد اللجان","المخطط","المنعقد","المتأخر","نسبة الالتزام"\n';
+  Object.entries(deptData).forEach(([dept, d]) => {
+    csv += `"${dept}","${d.committees}","${d.total}","${d.done}","${d.delayed}","${d.pct}%"\n`;
+  });
+  downloadCSV(csv, 'تقرير_التزام_الأقسام_' + new Date().toISOString().split('T')[0] + '.csv');
+}
+function downloadCSV(csv, filename) {
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('تم تصدير الملف ✅', 'success');
+}
+
+/* ================================================================= */
+/* @section: toast */
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity='0'; toast.style.transition='opacity 0.3s'; setTimeout(()=>toast.remove(),300); }, 4000);
+}
+
+/* ================================================================= */
+/* @section: helpers */
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+function parseDate(str) {
+  if (!str) return null;
+  const d = new Date(str);
+  return isNaN(d) ? null : d;
+}
+function formatDate(str) {
+  if (!str) return '—';
+  const d = parseDate(str);
+  if (!d) return str;
+  return d.toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
+}
+function shortName(name, maxLen = 30) {
+  if (!name) return '—';
+  return name.length > maxLen ? name.substring(0, maxLen) + '…' : name;
+}
+function shortDept(dept, maxLen = 22) {
+  if (!dept) return '—';
+  const map = {
+    'Hospital Administration':'إدارة المستشفى',
+    'Medical Administration':'الإدارة الطبية',
+    'Quality':'الجودة',
+    'Safety & Facility Mgmt':'السلامة والمنشآت',
+    'Medical Staff Office':'مكتب الهيئة الطبية',
+    'Patient Experience':'تجربة المريض',
+    'Pharmacy':'الصيدلية',
+    'Infection Control':'مكافحة العدوى',
+    'Training & Education':'التدريب والتعليم',
+    'Nursing':'التمريض',
+    'Laboratory':'المختبر',
+    'Pathology / Lab':'علم الأمراض',
+    'Surgery / OR':'الجراحة',
+    'Pediatrics & Obstetrics':'الأطفال والولادة',
+    'Health Information Mgmt':'المعلومات الصحية'
+  };
+  return map[dept] || (dept.length > maxLen ? dept.substring(0, maxLen) + '…' : dept);
+}
+function translateFreq(freq) {
+  const map = { Monthly:'شهري', Quarterly:'ربع سنوي', Annual:'سنوي', Weekly:'أسبوعي', 'Bi-Annual':'نصف سنوي', 'Semi-Annual':'نصف سنوي' };
+  return map[freq] || freq || '—';
+}
+function getStatusBadge(status) {
+  const map = {
+    'Completed':   '<span class="badge badge-success">✅ مكتملة</span>',
+    'Scheduled':   '<span class="badge badge-info">📅 مجدولة</span>',
+    'Delayed':     '<span class="badge badge-warning">⚠️ متأخرة</span>',
+    'Overdue':     '<span class="badge badge-danger">🔴 متأخرة جداً</span>',
+    'Upcoming':    '<span class="badge badge-purple">🔮 قادمة</span>',
+    'Cancelled':   '<span class="badge badge-muted">❌ ملغاة</span>'
+  };
+  return map[status] || `<span class="badge badge-muted">${status||'—'}</span>`;
+}
+
+/* ================================================================= */
+/* @section: app-bootstrap */
+document.addEventListener('DOMContentLoaded', () => {
+  applyDarkMode();
+  startClock();
+  // Default CSV pre-fill
+  document.getElementById('csvInput').value = localStorage.getItem(STORAGE_KEY) || DEFAULT_CSV;
+  document.getElementById('settingsCsvUrl').value = localStorage.getItem(STORAGE_KEY) || DEFAULT_CSV;
+  // Load demo data immediately for display before login
+  rawData = DEMO_DATA.map(r => ({...r}));
+  // Auto-login attempt after clicking login
+});
+
+</script>
+</body>
+</html>
